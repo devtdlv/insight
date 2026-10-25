@@ -1,8 +1,8 @@
 # Insight
 
-Insight is a product analytics platform. This milestone is the application foundation: a Laravel application with a React and TypeScript interface rendered through Inertia.js.
+Insight is a privacy-first product analytics platform for understanding how people use your software. It is a Laravel application with a React and TypeScript interface rendered through Inertia.js.
 
-The dashboard explains the product and lists planned capabilities. It does not collect events, and it does not show product metrics.
+The public page explains event tracking, conversion funnels, retention, and user journeys. The dashboard is an empty state for a signed-in user. It does not collect events, and it does not show product metrics. Light, dark, and system themes are supported.
 
 ## Stack
 

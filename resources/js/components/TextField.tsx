@@ -4,6 +4,7 @@ export function TextField({
   type = 'text',
   value,
   error,
+  hint,
   autoComplete,
   onChange,
 }: {
@@ -12,14 +13,19 @@ export function TextField({
   type?: 'text' | 'email' | 'password';
   value: string;
   error?: string;
+  hint?: string;
   autoComplete: string;
   onChange: (value: string) => void;
 }) {
   const errorId = `${id}-error`;
+  const hintId = `${id}-hint`;
+  const describedBy =
+    [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ') ||
+    undefined;
 
   return (
     <div>
-      <label htmlFor={id} className="block text-sm font-medium text-slate-800">
+      <label htmlFor={id} className="block text-sm font-medium text-ink">
         {label}
       </label>
       <input
@@ -30,12 +36,19 @@ export function TextField({
         autoComplete={autoComplete}
         required
         aria-invalid={error ? true : undefined}
-        aria-describedby={error ? errorId : undefined}
+        aria-describedby={describedBy}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 shadow-sm outline-none focus:border-teal-800"
+        className={`mt-1.5 w-full rounded-lg border bg-surface px-3 py-2 text-base text-ink shadow-[var(--shadow)] ${
+          error ? 'border-danger' : 'border-line'
+        }`}
       />
+      {hint ? (
+        <p id={hintId} className="mt-2 text-sm leading-5 text-muted">
+          {hint}
+        </p>
+      ) : null}
       {error ? (
-        <p id={errorId} role="alert" className="mt-2 text-sm text-rose-700">
+        <p id={errorId} role="alert" className="mt-2 text-sm text-danger">
           {error}
         </p>
       ) : null}

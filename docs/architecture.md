@@ -60,7 +60,11 @@ Shared Inertia props contain the application name, a flash status string, and th
 
 ## Interface
 
-`AppLayout` is the responsive shell: a skip link, the Insight wordmark, navigation, the API status indicator, and the signed-in user's name. Guests see links to log in and create an account. `Welcome` introduces Insight as a product analytics platform. `Dashboard` requires a session and states that analytics are not available yet. It lists the planned capabilities:
+`PublicLayout` renders the landing page: the Insight wordmark, a light, dark, and system theme control, and links to log in or create an account. `Welcome` describes privacy-first product analytics. Event tracking, conversion funnels, retention, and user journeys are explained as later work.
+
+`AuthLayout` renders login, registration, forgot password, and reset password. Validation errors stay tied to each field.
+
+`AppLayout` is the signed-in shell: a skip link, sidebar, mobile dialog navigation, theme control, API status, and an account menu whose logout is a POST. Dashboard is a working link. Workspaces, projects, events, funnels, retention, and settings are visible as coming-soon items and are not links. `Dashboard` requires a session and is an empty state. It lists the planned capabilities:
 
 - Event tracking
 - Conversion funnels
@@ -69,7 +73,7 @@ Shared Inertia props contain the application name, a flash status string, and th
 - Product engagement
 - Workspaces and projects
 
-The pages do not invent metrics. The status indicator calls `GET /api/v1/health` on the same origin and accepts only the two-field health contract.
+The pages do not invent metrics. The theme preference is stored in localStorage under `insight-theme`. That key does not hold credentials. The status indicator calls `GET /api/v1/health` on the same origin and accepts only the two-field health contract.
 
 ## API
 

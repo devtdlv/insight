@@ -1,7 +1,9 @@
 import { Link, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
+import { Button } from '../../components/Button.tsx';
 import { TextField } from '../../components/TextField.tsx';
 import { AuthLayout } from '../../layouts/AuthLayout.tsx';
+import { textLinkClass } from '../../lib/buttonStyles.ts';
 
 export default function Login() {
   const form = useForm({
@@ -19,13 +21,11 @@ export default function Login() {
   return (
     <AuthLayout
       title="Log in"
+      description="Use the email and password for your Insight account."
       footer={
         <p>
           New to Insight?{' '}
-          <Link
-            href="/register"
-            className="font-semibold text-teal-800 hover:text-teal-900"
-          >
+          <Link href="/register" className={textLinkClass}>
             Create an account
           </Link>
         </p>
@@ -51,19 +51,16 @@ export default function Login() {
           onChange={(value) => form.setData('password', value)}
         />
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <Link
-            href="/forgot-password"
-            className="text-sm font-medium text-teal-800 hover:text-teal-900"
-          >
+          <Link href="/forgot-password" className={textLinkClass}>
             Forgot your password?
           </Link>
-          <button
+          <Button
             type="submit"
+            className="w-full sm:w-auto"
             disabled={form.processing}
-            className="inline-flex justify-center rounded-md bg-teal-800 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-900 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {form.processing ? 'Signing in...' : 'Log in'}
-          </button>
+          </Button>
         </div>
       </form>
     </AuthLayout>

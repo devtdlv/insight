@@ -31,38 +31,39 @@ vi.mock('@inertiajs/react', () => ({
 
 beforeEach(() => {
   window.history.replaceState({}, '', '/');
-  vi.stubGlobal(
-    'fetch',
-    vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ status: 'ok', service: 'insight-api' }),
-    }),
-  );
+  window.localStorage.clear();
 });
 
-it('renders the Insight landing page', async () => {
+it('renders the Insight landing page', () => {
   render(<Welcome />);
 
   expect(
     screen.getByRole('heading', {
       level: 1,
-      name: 'Product analytics for the software you ship',
+      name: 'Privacy-first product analytics for understanding how people use your software.',
     }),
   ).toBeInTheDocument();
   expect(
     screen.getByText(/does not show product metrics/i),
   ).toBeInTheDocument();
   expect(screen.getByText(/does not collect events yet/i)).toBeInTheDocument();
-  expect(
-    screen.getByRole('link', { name: 'Open the dashboard' }),
-  ).toHaveAttribute('href', '/dashboard');
-  expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute(
-    'aria-current',
-    'page',
-  );
-  expect(screen.getByRole('link', { name: 'Log in' })).toHaveAttribute(
-    'href',
-    '/login',
-  );
-  expect(await screen.findByText('API connected')).toBeInTheDocument();
+
+  for (const title of [
+    'Event tracking',
+    'Conversion funnels',
+    'Retention',
+    'User journeys',
+  ]) {
+    expect(
+      screen.getByRole('heading', { level: 3, name: title }),
+    ).toBeInTheDocument();
+  }
+
+  for (const link of screen.getAllByRole('link', { name: 'Log in' })) {
+    expect(link).toHaveAttribute('href', '/login');
+  }
+
+  for (const link of screen.getAllByRole('link', { name: 'Create account' })) {
+    expect(link).toHaveAttribute('href', '/register');
+  }
 });

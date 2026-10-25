@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, expect, it, vi } from 'vitest';
 import Dashboard from './Dashboard.tsx';
@@ -80,7 +80,26 @@ it('renders the dashboard shell and planned capabilities', async () => {
     'aria-current',
     'page',
   );
+  expect(
+    screen.getByRole('navigation', { name: 'Primary' }),
+  ).toBeInTheDocument();
+
+  for (const label of [
+    'Workspaces',
+    'Projects',
+    'Events',
+    'Funnels',
+    'Retention',
+    'Settings',
+  ]) {
+    expect(screen.getByText(label)).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: label })).not.toBeInTheDocument();
+  }
+
   expect(screen.getByText('Ada Lovelace')).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: 'Log out' })).toBeInTheDocument();
+  fireEvent.click(
+    screen.getByRole('button', { name: 'Account menu for Ada Lovelace' }),
+  );
+  expect(screen.getByRole('menuitem', { name: 'Log out' })).toBeInTheDocument();
   expect(await screen.findByText('API connected')).toBeInTheDocument();
 });

@@ -1,7 +1,12 @@
 import { Link, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
+import { Button } from '../../components/Button.tsx';
 import { TextField } from '../../components/TextField.tsx';
 import { AuthLayout } from '../../layouts/AuthLayout.tsx';
+import { textLinkClass } from '../../lib/buttonStyles.ts';
+
+const passwordHint =
+  'Use at least 12 characters, with upper and lower case letters and a number.';
 
 export default function Register() {
   const form = useForm({
@@ -21,13 +26,11 @@ export default function Register() {
   return (
     <AuthLayout
       title="Create an account"
+      description="This creates your sign-in. It does not start event collection."
       footer={
         <p>
           Already have an account?{' '}
-          <Link
-            href="/login"
-            className="font-semibold text-teal-800 hover:text-teal-900"
-          >
+          <Link href="/login" className={textLinkClass}>
             Log in
           </Link>
         </p>
@@ -57,6 +60,7 @@ export default function Register() {
           type="password"
           value={form.data.password}
           error={form.errors.password}
+          hint={passwordHint}
           autoComplete="new-password"
           onChange={(value) => form.setData('password', value)}
         />
@@ -69,13 +73,9 @@ export default function Register() {
           autoComplete="new-password"
           onChange={(value) => form.setData('password_confirmation', value)}
         />
-        <button
-          type="submit"
-          disabled={form.processing}
-          className="inline-flex justify-center rounded-md bg-teal-800 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-900 disabled:cursor-not-allowed disabled:opacity-70"
-        >
+        <Button type="submit" className="w-full" disabled={form.processing}>
           {form.processing ? 'Creating account...' : 'Create account'}
-        </button>
+        </Button>
       </form>
     </AuthLayout>
   );
