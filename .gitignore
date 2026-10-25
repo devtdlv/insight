@@ -1,0 +1,28 @@
+# Secrets. Examples stay tracked.
+.env
+.env.local
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Dependencies and build output
+/node_modules
+/vendor
+/public/build
+/public/hot
+/public/storage
+
+# Laravel runtime files
+/database/*.sqlite
+/database/*.sqlite-journal
+/storage/*.key
+/storage/logs
+/bootstrap/cache/*.php
+.phpunit.cache
+.phpunit.result.cache
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
