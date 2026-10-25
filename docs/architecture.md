@@ -1,6 +1,6 @@
 # Insight architecture
 
-Insight is a product analytics platform. The application is a conventional Laravel app with a React and TypeScript interface. People sign in with a Laravel session. Workspaces, projects, event ingestion, funnels, retention, and billing are later milestones.
+Insight is a product analytics platform. The application is a conventional Laravel app with a React and TypeScript interface. People sign in with a Laravel session. A signed-in user can create workspaces, belong to them as an owner, admin, or member, and keep analytics projects inside a workspace. Event ingestion, funnels, retention, and billing are later milestones.
 
 ## Stack
 
@@ -56,7 +56,7 @@ insight/
 
 Server-side rendering is disabled. Vite compiles the client assets. `php artisan serve` and `npm run dev` run together during development.
 
-Shared Inertia props contain the application name, a flash status string, and the signed-in user's id and name. Passwords, tokens, and email addresses are not shared.
+Shared Inertia props contain the application name, a flash status string, the signed-in user's id and name, and the workspaces that user belongs to (`id`, `name`, and `role`). Passwords, tokens, and email addresses are not shared. The members page shows names and roles, and it does not include email addresses.
 
 ## Interface
 
@@ -64,7 +64,7 @@ Shared Inertia props contain the application name, a flash status string, and th
 
 `AuthLayout` renders login, registration, forgot password, and reset password. Validation errors stay tied to each field.
 
-`AppLayout` is the signed-in shell: a skip link, sidebar, mobile dialog navigation, theme control, API status, and an account menu whose logout is a POST. Dashboard is a working link. Workspaces, projects, events, funnels, retention, and settings are visible as coming-soon items and are not links. `Dashboard` requires a session and is an empty state. It lists the planned capabilities:
+`AppLayout` is the signed-in shell: a skip link, sidebar, mobile dialog navigation, theme control, API status, a workspace switcher, a flash status, and an account menu whose logout is a POST. Dashboard, Workspaces, and Projects are working links. Events, funnels, retention, and account settings stay visible as coming-soon items and are not links. `Dashboard` requires a session. It lists the signed-in user's workspaces and does not invent metrics. It also lists the planned capabilities:
 
 - Event tracking
 - Conversion funnels
@@ -149,11 +149,33 @@ Registration, login, logout, and password reset use Laravel's session guard and 
 
 Guest pages are `/login`, `/register`, `/forgot-password`, and `/reset-password/{token}`. `/dashboard` and `POST /logout` require a session. Reset mail uses the configured mailer. The local example uses the `log` mailer, so the reset message is written to the Laravel log until a delivery mailer is configured.
 
-The `users`, `password_reset_tokens`, and `sessions` tables come from the original migration. This milestone does not add another migration.
+The `users`, `password_reset_tokens`, and `sessions` tables come from the original migration. Authentication does not create a workspace.
+
+## Workspaces and projects
+
+Three migrations add `workspaces`, `workspace_memberships`, and `projects`. They do not change the users table. Apply them with `php artisan migrate` from the repository root. Do not run `migrate:fresh`, `migrate:reset`, or `db:wipe`.
+
+A user who creates a workspace becomes its only owner. Registration and login do not create a workspace. Roles are owner, admin, and member. Owners and admins can rename the workspace and can create, edit, archive, and restore projects. Members can view the workspace, its members, and its projects. They receive 403 when they try to change those records. Someone who is not a member receives 404, including when a project id is placed under another workspace's URL. Laravel policies (`WorkspacePolicy`, `ProjectPolicy`) decide view and manage rights. `App\Support\Tenant` turns a missing membership into 404 and a failed manage check into 403.
+
+Projects belong to one workspace. A project has a name, an optional description, an optional http or https website URL, a timezone, and an optional `archived_at`. Archive keeps the row. There is no workspace delete, project delete, invitation, role change, or ownership transfer in the product.
+
+Workspace URLs:
+
+- `GET /workspaces` and `GET /workspaces/create`
+- `POST /workspaces`
+- `GET /workspaces/{workspace}`, `GET /workspaces/{workspace}/settings`, `PATCH /workspaces/{workspace}`
+- `GET /workspaces/{workspace}/members`
+- `GET /workspaces/{workspace}/projects` and `GET /workspaces/{workspace}/projects/create`
+- `POST /workspaces/{workspace}/projects`
+- `GET /workspaces/{workspace}/projects/{project}` and `GET /workspaces/{workspace}/projects/{project}/settings`
+- `PATCH /workspaces/{workspace}/projects/{project}`
+- `POST /workspaces/{workspace}/projects/{project}/archive` and `POST .../restore`
+
+Nested project routes use scoped bindings, so a project resolves only when it belongs to the workspace in the URL.
 
 ## Later milestones
 
-- Workspaces and projects
+- Invitations, role changes, and ownership transfer
 - Event ingestion and a tracking SDK
 - Conversion funnels, retention, journeys, and engagement
 - Billing, notifications, and subscription plans

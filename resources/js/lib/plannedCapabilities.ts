@@ -27,6 +27,6 @@ export const plannedCapabilities = [
   {
     title: 'Workspaces and projects',
     detail:
-      'Organize analytics by team and product. Accounts and projects are a later milestone.',
+      'Workspaces and projects can be created now. Analytics inside them is a later milestone.',
   },
 ] as const;

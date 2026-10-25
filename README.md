@@ -2,7 +2,7 @@
 
 Insight is a privacy-first product analytics platform for understanding how people use your software. It is a Laravel application with a React and TypeScript interface rendered through Inertia.js.
 
-The public page explains event tracking, conversion funnels, retention, and user journeys. The dashboard is an empty state for a signed-in user. It does not collect events, and it does not show product metrics. Light, dark, and system themes are supported.
+The public page explains event tracking, conversion funnels, retention, and user journeys. A signed-in user can create workspaces and analytics projects. The dashboard lists those workspaces. It does not collect events, and it does not show product metrics. Light, dark, and system themes are supported.
 
 ## Stack
 
@@ -38,7 +38,13 @@ php artisan queue:work
 
 The existing MariaDB database is `insight` on `127.0.0.1:3306`, with the username `insight`. Copy `.env.example` to `.env` on a new machine and set `DB_USERNAME` and `DB_PASSWORD` there. Do not commit `.env`, and do not point `DB_DATABASE` at any other database.
 
-This environment already has the Insight migrations applied. Do not run `migrate:fresh`, `migrate:reset`, or `db:wipe`.
+The original cache, session, and queue migrations are already applied to MariaDB. Workspace tables are added by a later migration. From the repository root, run:
+
+```powershell
+php artisan migrate
+```
+
+Do not run `migrate:fresh`, `migrate:reset`, or `db:wipe`.
 
 ## Checks
 
@@ -63,9 +69,11 @@ npm run build
 - `GET /forgot-password` and `POST /forgot-password` request a password reset.
 - `GET /reset-password/{token}` and `POST /reset-password` choose a new password.
 - `GET /dashboard` renders the dashboard for a signed-in user.
+- `GET /workspaces` lists workspaces for the signed-in user. Creating one makes that user the owner.
+- `GET /workspaces/{workspace}` is the workspace overview. Settings, members, and projects are nested under that workspace.
 - `GET /api/v1/health` returns JSON: `{"status":"ok","service":"insight-api"}`.
 
-Password reset messages use `MAIL_MAILER`. The example environment logs them. No new database migration is required for authentication.
+Password reset messages use `MAIL_MAILER`. The example environment logs them. Authentication does not add a migration and does not create a workspace. Workspace, membership, and project tables are added with `php artisan migrate`.
 
 Web pages live in `routes/web.php`. The public API lives in `routes/api.php` and stays outside the Inertia middleware. Event ingestion is a later milestone.
 

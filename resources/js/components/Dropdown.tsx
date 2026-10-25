@@ -4,10 +4,12 @@ export function Dropdown({
   label,
   children,
   menu,
+  align = 'right',
 }: {
   label: string;
   children: ReactNode;
   menu: ReactNode;
+  align?: 'left' | 'right';
 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -76,7 +78,9 @@ export function Dropdown({
           id={menuId}
           role="menu"
           aria-label={label}
-          className="absolute right-0 z-30 mt-2 min-w-44 rounded-xl border border-line bg-surface p-1 shadow-[var(--shadow)]"
+          className={`absolute z-30 mt-2 min-w-44 rounded-xl border border-line bg-surface p-1 shadow-[var(--shadow)] ${
+            align === 'left' ? 'left-0' : 'right-0'
+          }`}
         >
           {menu}
         </div>

@@ -6,6 +6,7 @@ export function TextField({
   error,
   hint,
   autoComplete,
+  required = true,
   onChange,
 }: {
   id: string;
@@ -15,6 +16,7 @@ export function TextField({
   error?: string;
   hint?: string;
   autoComplete: string;
+  required?: boolean;
   onChange: (value: string) => void;
 }) {
   const errorId = `${id}-error`;
@@ -34,7 +36,7 @@ export function TextField({
         type={type}
         value={value}
         autoComplete={autoComplete}
-        required
+        required={required}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
         onChange={(event) => onChange(event.target.value)}

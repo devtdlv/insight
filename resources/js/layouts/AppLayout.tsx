@@ -7,6 +7,7 @@ import { MobileNav } from '../components/MobileNav.tsx';
 import { SidebarNav } from '../components/SidebarNav.tsx';
 import { SkipLink } from '../components/SkipLink.tsx';
 import { ThemeToggle } from '../components/ThemeToggle.tsx';
+import { WorkspaceSwitcher } from '../components/WorkspaceSwitcher.tsx';
 import { buttonClass } from '../lib/buttonStyles.ts';
 import type { SharedProps } from '../types/index.ts';
 
@@ -20,6 +21,7 @@ export function AppLayout({
   const { url, props } = usePage<SharedProps>();
   const path = url.split('?')[0] ?? url;
   const user = props.auth.user;
+  const workspaces = props.workspaces ?? [];
 
   return (
     <div className="min-h-screen bg-canvas text-ink">
@@ -37,9 +39,10 @@ export function AppLayout({
         </aside>
         <div className="flex min-w-0 flex-col">
           <header className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-surface px-4 py-3 sm:px-6">
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-3">
               <MobileNav path={path} />
               <Brand href="/dashboard" className="lg:hidden" />
+              <WorkspaceSwitcher workspaces={workspaces} path={path} />
             </div>
             <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
               <ApiStatus />
@@ -55,6 +58,14 @@ export function AppLayout({
           </header>
           <main id="main" className="flex-1 px-4 py-8 sm:px-8 lg:px-10">
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
+              {props.flash.status ? (
+                <p
+                  role="status"
+                  className="rounded-lg bg-success-soft px-3 py-2 text-sm text-success"
+                >
+                  {props.flash.status}
+                </p>
+              ) : null}
               {children}
             </div>
           </main>

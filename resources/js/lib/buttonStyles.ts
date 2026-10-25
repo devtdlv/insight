@@ -1,10 +1,13 @@
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'inverse';
+export type ButtonVariant =
+  'primary' | 'secondary' | 'ghost' | 'inverse' | 'danger';
 
 const variants: Record<ButtonVariant, string> = {
   primary: 'bg-accent text-accent-foreground hover:bg-accent-strong',
   secondary: 'border border-line bg-surface text-ink hover:bg-surface-muted',
   ghost: 'bg-transparent text-ink hover:bg-surface-muted',
   inverse: 'bg-transparent text-sidebar-ink hover:bg-sidebar-active',
+  danger:
+    'border border-danger bg-danger-soft text-danger hover:bg-danger-soft',
 };
 
 export function buttonClass(

@@ -15,33 +15,72 @@ type LinkItem = {
   icon: IconName;
 };
 
-const sections: { label: string; items: (LinkItem | SoonItem)[] }[] = [
-  {
-    label: 'Overview',
-    items: [
-      {
-        type: 'link',
-        href: '/dashboard',
-        label: 'Dashboard',
-        icon: 'dashboard',
-      },
-    ],
-  },
-  {
-    label: 'Product',
-    items: [
-      { type: 'soon', label: 'Workspaces', icon: 'workspaces' },
-      { type: 'soon', label: 'Projects', icon: 'projects' },
-      { type: 'soon', label: 'Events', icon: 'events' },
-      { type: 'soon', label: 'Funnels', icon: 'funnels' },
-      { type: 'soon', label: 'Retention', icon: 'retention' },
-    ],
-  },
-  {
-    label: 'Account',
-    items: [{ type: 'soon', label: 'Settings', icon: 'settings' }],
-  },
-];
+const sectionsFor = (
+  path: string,
+): { label: string; items: (LinkItem | SoonItem)[] }[] => {
+  const workspaceId = path.match(/^\/workspaces\/(\d+)/)?.[1];
+  const projectsHref = workspaceId
+    ? `/workspaces/${workspaceId}/projects`
+    : '/workspaces';
+
+  return [
+    {
+      label: 'Overview',
+      items: [
+        {
+          type: 'link',
+          href: '/dashboard',
+          label: 'Dashboard',
+          icon: 'dashboard',
+        },
+      ],
+    },
+    {
+      label: 'Product',
+      items: [
+        {
+          type: 'link',
+          href: '/workspaces',
+          label: 'Workspaces',
+          icon: 'workspaces',
+        },
+        {
+          type: 'link',
+          href: projectsHref,
+          label: 'Projects',
+          icon: 'projects',
+        },
+        { type: 'soon', label: 'Events', icon: 'events' },
+        { type: 'soon', label: 'Funnels', icon: 'funnels' },
+        { type: 'soon', label: 'Retention', icon: 'retention' },
+      ],
+    },
+    {
+      label: 'Account',
+      items: [{ type: 'soon', label: 'Settings', icon: 'settings' }],
+    },
+  ];
+};
+
+function isCurrent(path: string, item: LinkItem): boolean {
+  if (item.label === 'Dashboard') {
+    return path === '/dashboard';
+  }
+
+  if (item.label === 'Workspaces') {
+    return (
+      path === '/workspaces' ||
+      path === '/workspaces/create' ||
+      /^\/workspaces\/\d+(\/(settings|members))?$/.test(path)
+    );
+  }
+
+  if (item.label === 'Projects') {
+    return /\/projects(\/|$)/.test(path);
+  }
+
+  return path === item.href;
+}
 
 export function SidebarNav({
   path,
@@ -54,7 +93,7 @@ export function SidebarNav({
 }) {
   return (
     <nav aria-label="Primary" className={className}>
-      {sections.map((section) => (
+      {sectionsFor(path).map((section) => (
         <div key={section.label} className="pt-4 first:pt-0">
           <p className="px-3 pb-2 text-xs font-medium text-sidebar-muted">
             {section.label}
@@ -65,10 +104,10 @@ export function SidebarNav({
                 {item.type === 'link' ? (
                   <Link
                     href={item.href}
-                    aria-current={path === item.href ? 'page' : undefined}
+                    aria-current={isCurrent(path, item) ? 'page' : undefined}
                     onClick={onNavigate}
                     className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium motion-safe:transition-colors ${
-                      path === item.href
+                      isCurrent(path, item)
                         ? 'bg-sidebar-active text-sidebar-ink'
                         : 'text-sidebar-muted hover:bg-sidebar-active hover:text-sidebar-ink'
                     }`}

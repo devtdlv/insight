@@ -37,6 +37,7 @@ vi.mock('@inertiajs/react', () => ({
       name: 'Insight',
       auth: { user: { id: 1, name: 'Ada Lovelace' } },
       flash: { status: null },
+      workspaces: [],
     },
   }),
 }));
@@ -84,14 +85,16 @@ it('renders the dashboard shell and planned capabilities', async () => {
     screen.getByRole('navigation', { name: 'Primary' }),
   ).toBeInTheDocument();
 
-  for (const label of [
-    'Workspaces',
-    'Projects',
-    'Events',
-    'Funnels',
-    'Retention',
-    'Settings',
-  ]) {
+  expect(screen.getByRole('link', { name: 'Workspaces' })).toHaveAttribute(
+    'href',
+    '/workspaces',
+  );
+  expect(screen.getByRole('link', { name: 'Projects' })).toHaveAttribute(
+    'href',
+    '/workspaces',
+  );
+
+  for (const label of ['Events', 'Funnels', 'Retention', 'Settings']) {
     expect(screen.getByText(label)).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: label })).not.toBeInTheDocument();
   }
