@@ -57,8 +57,15 @@ npm run build
 ## Routes
 
 - `GET /` renders the Insight landing page through Inertia.
-- `GET /dashboard` renders the dashboard placeholder through Inertia.
+- `GET /register` and `POST /register` create an account.
+- `GET /login` and `POST /login` start a session.
+- `POST /logout` ends a session.
+- `GET /forgot-password` and `POST /forgot-password` request a password reset.
+- `GET /reset-password/{token}` and `POST /reset-password` choose a new password.
+- `GET /dashboard` renders the dashboard for a signed-in user.
 - `GET /api/v1/health` returns JSON: `{"status":"ok","service":"insight-api"}`.
+
+Password reset messages use `MAIL_MAILER`. The example environment logs them. No new database migration is required for authentication.
 
 Web pages live in `routes/web.php`. The public API lives in `routes/api.php` and stays outside the Inertia middleware. Event ingestion is a later milestone.
 

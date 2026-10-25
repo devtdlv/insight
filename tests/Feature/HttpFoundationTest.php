@@ -6,10 +6,8 @@ it('renders the welcome page through inertia', function () {
         ->assertInertia(fn ($page) => $page->component('Welcome'));
 });
 
-it('renders the dashboard page through inertia', function () {
-    $this->get('/dashboard')
-        ->assertOk()
-        ->assertInertia(fn ($page) => $page->component('Dashboard'));
+it('sends guests from the dashboard to login', function () {
+    $this->get('/dashboard')->assertRedirect(route('login'));
 });
 
 it('returns json for unknown api routes without a stack trace', function () {

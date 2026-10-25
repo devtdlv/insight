@@ -8,18 +8,37 @@ vi.mock('@inertiajs/react', () => ({
   Link: ({
     href,
     children,
+    as,
     className,
+    method,
     ...rest
   }: {
     href: string;
     children: ReactNode;
+    as?: string;
     className?: string;
-  }) => (
-    <a href={href} className={className} {...rest}>
-      {children}
-    </a>
-  ),
-  usePage: () => ({ url: window.location.pathname }),
+    method?: string;
+  }) => {
+    void method;
+
+    return as === 'button' ? (
+      <button type="button" className={className} {...rest}>
+        {children}
+      </button>
+    ) : (
+      <a href={href} className={className} {...rest}>
+        {children}
+      </a>
+    );
+  },
+  usePage: () => ({
+    url: window.location.pathname,
+    props: {
+      name: 'Insight',
+      auth: { user: { id: 1, name: 'Ada Lovelace' } },
+      flash: { status: null },
+    },
+  }),
 }));
 
 beforeEach(() => {
@@ -61,5 +80,7 @@ it('renders the dashboard shell and planned capabilities', async () => {
     'aria-current',
     'page',
   );
+  expect(screen.getByText('Ada Lovelace')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Log out' })).toBeInTheDocument();
   expect(await screen.findByText('API connected')).toBeInTheDocument();
 });

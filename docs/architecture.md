@@ -1,6 +1,6 @@
 # Insight architecture
 
-Insight is a product analytics platform. The first milestone is a conventional Laravel application with a React and TypeScript interface. Authentication, workspaces, projects, event ingestion, funnels, retention, billing, and notifications are later milestones.
+Insight is a product analytics platform. The application is a conventional Laravel app with a React and TypeScript interface. People sign in with a Laravel session. Workspaces, projects, event ingestion, funnels, retention, and billing are later milestones.
 
 ## Stack
 
@@ -56,11 +56,11 @@ insight/
 
 Server-side rendering is disabled. Vite compiles the client assets. `php artisan serve` and `npm run dev` run together during development.
 
-The shared Inertia props contain the application name only. Secrets are not shared with the browser.
+Shared Inertia props contain the application name, a flash status string, and the signed-in user's id and name. Passwords, tokens, and email addresses are not shared.
 
 ## Interface
 
-`AppLayout` is the responsive shell: a skip link, the Insight wordmark, Home and Dashboard links, and the API status indicator. `Welcome` introduces Insight as a product analytics platform. `Dashboard` states that analytics are not available yet and lists the planned capabilities:
+`AppLayout` is the responsive shell: a skip link, the Insight wordmark, navigation, the API status indicator, and the signed-in user's name. Guests see links to log in and create an account. `Welcome` introduces Insight as a product analytics platform. `Dashboard` requires a session and states that analytics are not available yet. It lists the planned capabilities:
 
 - Event tracking
 - Conversion funnels
@@ -139,9 +139,16 @@ npm test
 npm run build
 ```
 
+## Authentication
+
+Registration, login, logout, and password reset use Laravel's session guard and password broker. Sessions are stored in the database. Login regenerates the session. Logout invalidates it and replaces the CSRF token. Login attempts are rate limited. Password reset responses use the same confirmation whether or not the email matches an account.
+
+Guest pages are `/login`, `/register`, `/forgot-password`, and `/reset-password/{token}`. `/dashboard` and `POST /logout` require a session. Reset mail uses the configured mailer. The local example uses the `log` mailer, so the reset message is written to the Laravel log until a delivery mailer is configured.
+
+The `users`, `password_reset_tokens`, and `sessions` tables come from the original migration. This milestone does not add another migration.
+
 ## Later milestones
 
-- Authentication
 - Workspaces and projects
 - Event ingestion and a tracking SDK
 - Conversion funnels, retention, journeys, and engagement

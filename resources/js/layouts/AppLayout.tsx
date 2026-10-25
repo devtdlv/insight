@@ -1,11 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { ApiStatus } from '../components/ApiStatus.tsx';
-
-const links = [
-  { href: '/', label: 'Home' },
-  { href: '/dashboard', label: 'Dashboard' },
-] as const;
+import type { SharedProps } from '../types/index.ts';
 
 export function AppLayout({
   title,
@@ -14,8 +10,15 @@ export function AppLayout({
   title: string;
   children: ReactNode;
 }) {
-  const { url } = usePage();
+  const { url, props } = usePage<SharedProps>();
   const path = url.split('?')[0] ?? url;
+  const user = props.auth.user;
+  const links = user
+    ? [
+        { href: '/', label: 'Home' },
+        { href: '/dashboard', label: 'Dashboard' },
+      ]
+    : [{ href: '/', label: 'Home' }];
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
@@ -71,7 +74,39 @@ export function AppLayout({
         <div className="flex min-w-0 flex-col">
           <header className="flex flex-col gap-3 border-b border-slate-200 bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <p className="text-sm text-slate-600">Product analytics</p>
-            <ApiStatus />
+            <div className="flex flex-wrap items-center gap-3">
+              <ApiStatus />
+              {user ? (
+                <>
+                  <p className="text-sm font-medium text-slate-950">
+                    {user.name}
+                  </p>
+                  <Link
+                    href="/logout"
+                    method="post"
+                    as="button"
+                    className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
+                  >
+                    Log out
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                  >
+                    Log in
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="rounded-md bg-teal-800 px-3 py-2 text-sm font-semibold text-white hover:bg-teal-900"
+                  >
+                    Create account
+                  </Link>
+                </>
+              )}
+            </div>
           </header>
           <main id="main" className="flex-1 px-4 py-8 sm:px-8">
             {children}

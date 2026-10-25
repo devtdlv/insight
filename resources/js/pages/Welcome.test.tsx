@@ -19,7 +19,14 @@ vi.mock('@inertiajs/react', () => ({
       {children}
     </a>
   ),
-  usePage: () => ({ url: window.location.pathname }),
+  usePage: () => ({
+    url: window.location.pathname,
+    props: {
+      name: 'Insight',
+      auth: { user: null },
+      flash: { status: null },
+    },
+  }),
 }));
 
 beforeEach(() => {
@@ -52,6 +59,10 @@ it('renders the Insight landing page', async () => {
   expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute(
     'aria-current',
     'page',
+  );
+  expect(screen.getByRole('link', { name: 'Log in' })).toHaveAttribute(
+    'href',
+    '/login',
   );
   expect(await screen.findByText('API connected')).toBeInTheDocument();
 });
