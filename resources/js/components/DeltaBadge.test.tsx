@@ -1,4 +1,4 @@
-﻿import { render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { expect, it } from 'vitest';
 import { compareMetric } from '../lib/analytics.ts';
 import { DeltaBadge } from './DeltaBadge.tsx';
@@ -59,7 +59,7 @@ it('describes a change from zero without Infinity or NaN', () => {
     <DeltaBadge comparison={compareMetric(5, 0)} previous={0} />,
   );
 
-  expect(container).toHaveTextContent('5 from 0');
+  expect(container).toHaveTextContent('No baseline');
   expect(container).not.toHaveTextContent(/Infinity|NaN/);
 });
 

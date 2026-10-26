@@ -1,6 +1,5 @@
 import { usePage } from '@inertiajs/react';
 import { AuthActions } from '../components/AuthActions.tsx';
-import { Badge } from '../components/Badge.tsx';
 import { Card } from '../components/Card.tsx';
 import { PublicLayout } from '../layouts/PublicLayout.tsx';
 import type { SharedProps } from '../types/index.ts';
@@ -8,23 +7,19 @@ import type { SharedProps } from '../types/index.ts';
 const topics = [
   {
     title: 'Event tracking',
-    body: 'Event tracking records the actions an application chooses to send, such as finishing a task. Insight does not record page views or clicks on its own.',
-    status: 'SDK available',
+    body: 'Applications send the actions they choose, such as finishing a task, through the Insight SDK. Insight does not record page views or clicks on its own.',
   },
   {
-    title: 'Conversion funnels',
-    body: 'A conversion funnel is an ordered set of actions. It will show where people continue and where they stop. Funnel analysis is not available yet.',
-    status: 'Not available yet',
+    title: 'Activity over time',
+    body: 'See how many events arrive each hour or day, in the timezone of your project, with partial periods clearly marked.',
   },
   {
-    title: 'Retention',
-    body: 'Retention asks who returns after a first action, and who does not. Retention views are not available yet.',
-    status: 'Not available yet',
+    title: 'Visitors and users',
+    body: 'Count unique visitors and identified users, and compare each period with the one before it.',
   },
   {
-    title: 'User journeys',
-    body: 'A user journey is the path someone takes across your product. Journey maps are not available yet.',
-    status: 'Not available yet',
+    title: 'Top events',
+    body: 'Find the events your product sends most often and what share of activity each one represents.',
   },
 ] as const;
 
@@ -34,61 +29,25 @@ export default function Welcome() {
   return (
     <PublicLayout title="Home">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
-          <div className="max-w-3xl">
-            <p className="text-sm font-semibold text-accent">Insight</p>
-            <h1 className="mt-3 text-4xl leading-[1.15] text-ink sm:text-5xl">
-              Privacy-first product analytics for understanding how people use
-              your software.
-            </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-muted">
-              Insight records an event only when an application calls the SDK.
-              This page does not show product metrics. Creating an account only
-              signs you in.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <AuthActions user={user} />
-            </div>
+        <div className="max-w-3xl">
+          <p className="text-sm font-semibold text-accent">Insight</p>
+          <h1 className="mt-3 text-4xl leading-[1.15] text-ink sm:text-5xl">
+            Privacy-first product analytics for understanding how people use
+            your software.
+          </h1>
+          <p className="mt-5 max-w-2xl text-base leading-7 text-muted">
+            Insight records an event only when an application calls the SDK.
+            This page does not show product metrics. Creating an account only
+            signs you in.
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <AuthActions user={user} />
           </div>
-          <section aria-labelledby="future-views-heading">
-            <Card>
-              <h2 id="future-views-heading" className="text-lg text-ink">
-                Product views
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-muted">
-                Event tracking and per-project analytics are available after you
-                sign in. The other views are planned.
-              </p>
-              <ul className="mt-5 grid gap-3">
-                {topics.map((topic) => (
-                  <li
-                    key={topic.title}
-                    className="flex items-center justify-between gap-3 rounded-lg bg-canvas px-3 py-2"
-                  >
-                    <span className="text-sm font-medium text-ink">
-                      {topic.title}
-                    </span>
-                    <Badge
-                      tone={
-                        topic.status === 'SDK available' ? 'accent' : 'neutral'
-                      }
-                    >
-                      {topic.status}
-                    </Badge>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          </section>
         </div>
         <section className="mt-16" aria-labelledby="understand-heading">
           <h2 id="understand-heading" className="text-3xl text-ink">
-            What you will be able to learn
+            What you can learn
           </h2>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-muted">
-            These are the questions Insight is being built to answer. They are
-            not available yet.
-          </p>
           <ul className="mt-8 grid gap-4 md:grid-cols-2">
             {topics.map((topic) => (
               <li key={topic.title}>

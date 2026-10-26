@@ -250,7 +250,8 @@ describe('comparison states', () => {
       }),
     );
 
-    expect(screen.getByText('1,200 from 0')).toBeInTheDocument();
+    expect(screen.getAllByText('No baseline')).toHaveLength(3);
+    expect(document.body.textContent).not.toMatch(/from 0|↑/);
     expect(document.body.textContent).not.toMatch(/NaN|Infinity/);
   });
 
@@ -497,6 +498,10 @@ describe('project information and actions', () => {
     expect(results.innerHTML).toContain(
       '@4xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]',
     );
+    // Cards keep their own height instead of stretching to the tallest one.
+    expect(results.innerHTML).toContain('items-start gap-6');
+    // The pending message is positioned out of flow, so it adds no empty row.
+    expect(screen.getByTestId('analytics-status')).toHaveClass('absolute');
   });
 });
 

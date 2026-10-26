@@ -84,7 +84,7 @@ function ProjectSettings({
       {confirming ? (
         <ConfirmDialog
           title={`Archive ${project.name}?`}
-          description="The project stays in this workspace and can be restored. This does not remove analytics, because none are collected yet."
+          description="The project stays in this workspace and can be restored. Archiving does not delete its events, but the project stops accepting new ones until it is restored."
           confirmLabel="Archive project"
           pending={archiveForm.processing}
           onConfirm={archive}

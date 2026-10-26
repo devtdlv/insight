@@ -74,6 +74,10 @@ it('shows login validation feedback and posts the form', () => {
     'These credentials do not match our records.',
   );
   expect(
+    screen.getByText(/explore activity, visitors, and top events/i),
+  ).toBeInTheDocument();
+  expect(screen.queryByText(/No product metrics/i)).not.toBeInTheDocument();
+  expect(
     screen.getByRole('link', { name: 'Forgot your password?' }),
   ).toHaveAttribute('href', '/forgot-password');
   expect(

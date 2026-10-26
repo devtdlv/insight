@@ -52,9 +52,9 @@ it('renders the Insight landing page', () => {
 
   for (const title of [
     'Event tracking',
-    'Conversion funnels',
-    'Retention',
-    'User journeys',
+    'Activity over time',
+    'Visitors and users',
+    'Top events',
   ]) {
     expect(
       screen.getByRole('heading', { level: 3, name: title }),

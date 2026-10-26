@@ -61,18 +61,11 @@ Shared Inertia props contain the application name, a flash status string, the si
 
 ## Interface
 
-`PublicLayout` renders the landing page: the Insight wordmark, a light, dark, and system theme control, and links to log in or create an account. `Welcome` describes privacy-first product analytics. Event tracking, conversion funnels, retention, and user journeys are explained as later work.
+`PublicLayout` renders the landing page: the Insight wordmark, a light, dark, and system theme control, and links to log in or create an account. `Welcome` describes privacy-first product analytics and what the product shows today.
 
 `AuthLayout` renders login, registration, forgot password, and reset password. Validation errors stay tied to each field.
 
-`AppLayout` is the signed-in shell: a skip link, sidebar, mobile dialog navigation, theme control, API status, a workspace switcher, a flash status, and an account menu whose logout is a POST. Dashboard, Workspaces, and Projects are working links. Events, funnels, retention, and account settings stay visible as coming-soon items and are not links. `Dashboard` requires a session. It lists the signed-in user's workspaces and does not invent metrics. It also lists the planned capabilities:
-
-- Event tracking
-- Conversion funnels
-- Retention analytics
-- User journeys
-- Product engagement
-- Workspaces and projects
+`AppLayout` is the signed-in shell: a skip link, sidebar, mobile dialog navigation, theme control, API status, a workspace switcher, a flash status, and an account menu whose logout is a POST. The sidebar lists only working links: Dashboard, Workspaces, Projects, and Events. Unfinished features are not shown in the application. `Dashboard` requires a session. It lists the signed-in user's workspaces and explains where project analytics live. Planned work is listed in the README.
 
 The pages do not invent metrics. The theme preference is stored in localStorage under `insight-theme`. That key does not hold credentials. The status indicator calls `GET /api/v1/health` on the same origin and accepts only the two-field health contract.
 

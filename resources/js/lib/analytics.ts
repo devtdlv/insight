@@ -180,12 +180,12 @@ export function describeComparison(
       : ` (previous period: ${format(options.previous)})`;
 
   if (comparison.percent === null) {
-    const text = `${format(comparison.change)} from 0`;
-
+    // An increase from 0 has no meaningful percentage and is not a growth
+    // claim, so it gets no arrow and no figure.
     return {
-      arrow,
-      text,
-      description: `${direction} ${text} compared with the previous period${previous}.`,
+      arrow: '',
+      text: 'No baseline',
+      description: `No percentage change is available because the previous period was 0. The current value is ${format(comparison.change)}.`,
     };
   }
 

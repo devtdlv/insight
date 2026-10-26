@@ -238,7 +238,7 @@ function ProjectShow({
         <Unavailable workspaceId={workspace.id} projectId={project.id} />
       ) : (
         <>
-          <Card>
+          <Card className="relative py-4">
             <DateRangeSelector
               workspaceId={workspace.id}
               projectId={project.id}
@@ -248,7 +248,7 @@ function ProjectShow({
             />
             <p
               role="status"
-              className="mt-2 h-5 text-sm text-muted"
+              className="absolute top-4 right-5 text-sm text-muted"
               data-testid="analytics-status"
             >
               {pending ? 'Updating analytics...' : ''}
@@ -270,7 +270,7 @@ function ProjectShow({
                 previousHadEvents={finite(data.previous.totalEvents) > 0}
               />
             ) : (
-              <div className="grid gap-6 @4xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+              <div className="grid items-start gap-6 @4xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
                 <ActivityChart
                   buckets={data.activity}
                   granularity={data.range.granularity}

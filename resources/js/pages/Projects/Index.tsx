@@ -24,7 +24,7 @@ function ProjectIndex({
       <PageHeader
         eyebrow={workspace.name}
         title="Projects"
-        description="Projects are the websites or applications in this workspace. They do not show product metrics yet."
+        description="Create and manage projects to track events, explore visitor activity, and understand how people use your applications."
       />
       <WorkspaceNav workspace={workspace} current="projects" />
       {workspace.canManage ? (

@@ -28,15 +28,23 @@ export function AppLayout({
       <Head title={title} />
       <SkipLink />
       <div className="lg:grid lg:min-h-screen lg:grid-cols-[16.5rem_minmax(0,1fr)]">
-        <aside className="on-sidebar sticky top-0 hidden h-screen flex-col border-r border-sidebar-line bg-sidebar text-sidebar-ink lg:flex">
-          <div className="px-4 py-5">
-            <Brand href="/dashboard" tone="inverse" />
-          </div>
-          <SidebarNav
-            path={path}
-            className="flex-1 overflow-y-auto px-3 pb-6"
-          />
-        </aside>
+        {/* The grid cell paints the sidebar background, so it stretches with the
+            row to the full document height. The sticky panel inside keeps the
+            navigation in view while the page scrolls. */}
+        <div
+          data-testid="sidebar-column"
+          className="hidden border-r border-sidebar-line bg-sidebar lg:block"
+        >
+          <aside className="on-sidebar sticky top-0 flex h-screen flex-col text-sidebar-ink">
+            <div className="px-4 py-5">
+              <Brand href="/dashboard" tone="inverse" />
+            </div>
+            <SidebarNav
+              path={path}
+              className="flex-1 overflow-y-auto px-3 pb-6"
+            />
+          </aside>
+        </div>
         <div className="flex min-w-0 flex-col">
           <header className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-surface px-4 py-3 sm:px-6">
             <div className="flex min-w-0 items-center gap-3">

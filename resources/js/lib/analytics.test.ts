@@ -167,9 +167,10 @@ describe('describeComparison', () => {
 
   it('describes a change from zero without a percent', () => {
     expect(describeComparison(compareMetric(5, 0))).toEqual({
-      arrow: '↑',
-      text: '5 from 0',
-      description: 'Up 5 from 0 compared with the previous period.',
+      arrow: '',
+      text: 'No baseline',
+      description:
+        'No percentage change is available because the previous period was 0. The current value is 5.',
     });
   });
 
@@ -187,7 +188,8 @@ describe('describeComparison', () => {
       format: (value) => `${value.toFixed(1)}x`,
     });
 
-    expect(display.text).toBe('3.0x from 0');
+    expect(display.text).toBe('No baseline');
+    expect(display.description).toContain('3.0x');
   });
 });
 

@@ -45,6 +45,12 @@ it('links each membership to its workspace', () => {
     screen.getByRole('heading', { level: 1, name: 'Your workspaces' }),
   ).toBeInTheDocument();
   expect(
+    screen.getByText(
+      'Organize your products into workspaces and manage their projects, members, and analytics in one place.',
+    ),
+  ).toBeInTheDocument();
+  expect(screen.queryByText(/does not show product metrics/i)).toBeNull();
+  expect(
     screen.getByRole('heading', { level: 2, name: 'Ada Lab' }),
   ).toBeInTheDocument();
   expect(screen.getByRole('link', { name: 'Open workspace' })).toHaveAttribute(

@@ -3,7 +3,6 @@ import { Badge } from '../components/Badge.tsx';
 import { Card } from '../components/Card.tsx';
 import { EmptyState } from '../components/EmptyState.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
-import { PlannedCapabilities } from '../components/PlannedCapabilities.tsx';
 import { appPage } from '../layouts/appPage.ts';
 import { buttonClass } from '../lib/buttonStyles.ts';
 import { paths, roleLabel } from '../lib/paths.ts';
@@ -11,22 +10,16 @@ import type { SharedProps } from '../types/index.ts';
 
 const steps = [
   {
-    status: 'Available',
-    tone: 'accent',
     title: 'Organize products',
     detail:
       'Create a workspace, then add the websites or applications you want to understand.',
   },
   {
-    status: 'Available',
-    tone: 'accent',
     title: 'Send events',
     detail:
       'Add the Insight SDK to an application. Each project has a tracking setup page.',
   },
   {
-    status: 'Available',
-    tone: 'accent',
     title: 'Read project analytics',
     detail:
       'Each project overview shows its totals, activity chart, and top events.',
@@ -41,7 +34,7 @@ function Dashboard() {
       <PageHeader
         eyebrow="Overview"
         title="Dashboard"
-        description="Open a project to see its analytics. Workspace-wide reporting is not available yet."
+        description="Open a project to see its events, visitors, and activity."
       />
       <section className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -87,12 +80,9 @@ function Dashboard() {
         <ol className="grid gap-3 sm:grid-cols-3">
           {steps.map((step, index) => (
             <li key={step.title} className="rounded-lg bg-canvas px-3 py-3">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-sm font-semibold text-ink">
-                  {index + 1}
-                </span>
-                <Badge tone={step.tone}>{step.status}</Badge>
-              </div>
+              <span className="text-sm font-semibold text-accent">
+                {index + 1}
+              </span>
               <p className="mt-3 text-sm font-semibold text-ink">
                 {step.title}
               </p>
@@ -101,7 +91,6 @@ function Dashboard() {
           ))}
         </ol>
       </EmptyState>
-      <PlannedCapabilities />
     </>
   );
 }

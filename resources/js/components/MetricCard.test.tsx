@@ -1,4 +1,4 @@
-﻿import { render, screen, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { expect, it } from 'vitest';
 import { compareMetric, formatCount, formatRatio } from '../lib/analytics.ts';
 import { MetricCard } from './MetricCard.tsx';
@@ -73,5 +73,5 @@ it('supports a custom formatter for ratio differences', () => {
     />,
   );
 
-  expect(screen.getByText('3 from 0')).toBeInTheDocument();
+  expect(screen.getByText('No baseline')).toBeInTheDocument();
 });

@@ -30,13 +30,12 @@ export function AuthLayout({
               your software.
             </p>
             <p className="mt-4 text-sm leading-6 text-muted">
-              Sign in is available. Event tracking sends only the events an
-              application chooses. Funnels, retention, and journeys are not
-              available yet.
+              Event tracking sends only the events an application chooses.
             </p>
           </div>
           <p className="text-sm text-muted">
-            No product metrics are collected in this version.
+            Track events from your application and explore activity, visitors,
+            and top events for each project.
           </p>
         </section>
         <main

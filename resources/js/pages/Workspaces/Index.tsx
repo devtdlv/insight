@@ -16,7 +16,7 @@ function WorkspaceIndex() {
       <PageHeader
         eyebrow="Workspaces"
         title="Your workspaces"
-        description="A workspace groups the products you want to understand. Insight does not show product metrics on this page."
+        description="Organize your products into workspaces and manage their projects, members, and analytics in one place."
       />
       <div>
         <Link href={paths.workspaceCreate()} className={buttonClass('primary')}>
