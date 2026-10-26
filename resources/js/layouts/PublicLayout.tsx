@@ -32,7 +32,8 @@ export function PublicLayout({
       <footer className="border-t border-line">
         <div className="mx-auto max-w-6xl px-4 py-6 text-sm text-muted sm:px-6">
           <p>
-            Account sign-in is available. Product analytics is a later release.
+            Account sign-in, event tracking, and project analytics are
+            available. Funnels, retention, and journeys are planned.
           </p>
         </div>
       </footer>

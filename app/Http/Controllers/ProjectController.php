@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Enums\WorkspaceRole;
+use App\Http\Requests\ProjectAnalyticsRequest;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Models\Project;
 use App\Models\Workspace;
+use App\Services\Analytics\ProjectAnalytics;
+use App\Support\Analytics\DateRangeResolver;
 use App\Support\Tenant;
 use App\Support\Timezones;
 use Illuminate\Http\RedirectResponse;
@@ -51,15 +54,25 @@ class ProjectController extends Controller
             ->with('status', 'Project created.');
     }
 
-    public function show(Request $request, Workspace $workspace, Project $project): Response
+    public function show(ProjectAnalyticsRequest $request, Workspace $workspace, Project $project, ProjectAnalytics $analytics): Response
     {
         Tenant::project($workspace, $project);
         $role = Tenant::role($request, $workspace);
         abort_unless($request->user()?->can('view', $project) === true, 404);
 
+        // Validated by ProjectAnalyticsRequest, using the project's own timezone.
+        $range = (new DateRangeResolver)->resolve(
+            $project->timezone,
+            $request->filled('range') ? (string) $request->validated('range') : null,
+            $request->filled('from') ? (string) $request->validated('from') : null,
+            $request->filled('to') ? (string) $request->validated('to') : null,
+        );
+
         return Inertia::render('Projects/Show', [
             'workspace' => $this->workspacePayload($workspace, $role),
             'project' => $this->projectPayload($project, $role->canManage()),
+            // Evaluated only when requested, so partial reloads that exclude it skip the queries.
+            'analytics' => fn (): array => $analytics->summarize($project, $range)->toArray(),
         ]);
     }
 

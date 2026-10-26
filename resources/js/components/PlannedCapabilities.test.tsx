@@ -6,7 +6,7 @@ import { PlannedCapabilities } from './PlannedCapabilities.tsx';
 it('lists the planned analytics capabilities without metrics', () => {
   render(<PlannedCapabilities />);
 
-  expect(plannedCapabilities).toHaveLength(6);
+  expect(plannedCapabilities).toHaveLength(7);
 
   for (const item of plannedCapabilities) {
     expect(

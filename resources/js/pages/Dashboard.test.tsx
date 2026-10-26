@@ -64,13 +64,20 @@ it('renders the dashboard shell and planned capabilities', async () => {
   expect(
     screen.getByRole('heading', { level: 1, name: 'Dashboard' }),
   ).toBeInTheDocument();
-  expect(screen.getByText(/coming later/i)).toBeInTheDocument();
   expect(
-    screen.getByText(/does not show product metrics/i),
+    screen.getByText(/Workspace-wide reporting is not available yet/i),
+  ).toBeInTheDocument();
+  expect(document.body.textContent).not.toMatch(/coming later|No chart/i);
+  expect(
+    screen.getByRole('heading', {
+      level: 2,
+      name: 'Find your product data in each project',
+    }),
   ).toBeInTheDocument();
 
   for (const title of [
     'Event tracking',
+    'Project analytics',
     'Conversion funnels',
     'Retention analytics',
     'User journeys',

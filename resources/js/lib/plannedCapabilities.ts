@@ -3,7 +3,13 @@ export const plannedCapabilities = [
     title: 'Event tracking',
     badge: 'Available',
     detail:
-      'Applications can send named events through the Insight SDK. Charts are a later milestone.',
+      'Applications send named events through the Insight SDK. Recent events are listed on each project.',
+  },
+  {
+    title: 'Project analytics',
+    badge: 'Available',
+    detail:
+      'Each project shows total events, unique visitors, identified users, events per visitor, an activity chart, top events, and date ranges.',
   },
   {
     title: 'Conversion funnels',
@@ -33,6 +39,6 @@ export const plannedCapabilities = [
     title: 'Workspaces and projects',
     badge: 'Available',
     detail:
-      'Workspaces and projects can be created now. Event collection is available. Charts are a later milestone.',
+      'Workspaces and projects can be created now. Workspace-wide reporting is planned.',
   },
 ] as const;

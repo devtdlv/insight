@@ -11,24 +11,25 @@ import type { SharedProps } from '../types/index.ts';
 
 const steps = [
   {
-    status: 'Now',
-    tone: 'accent',
-    title: 'Sign in',
-    detail: 'Your account is the signed-in home. This screen is ready to use.',
-  },
-  {
-    status: 'Now',
+    status: 'Available',
     tone: 'accent',
     title: 'Organize products',
     detail:
       'Create a workspace, then add the websites or applications you want to understand.',
   },
   {
-    status: 'Later',
-    tone: 'neutral',
-    title: 'Read behavior',
+    status: 'Available',
+    tone: 'accent',
+    title: 'Send events',
     detail:
-      'Funnels, retention, and journeys will appear after events are collected.',
+      'Add the Insight SDK to an application. Each project has a tracking setup page.',
+  },
+  {
+    status: 'Available',
+    tone: 'accent',
+    title: 'Read project analytics',
+    detail:
+      'Each project overview shows its totals, activity chart, and top events.',
   },
 ] as const;
 
@@ -40,7 +41,7 @@ function Dashboard() {
       <PageHeader
         eyebrow="Overview"
         title="Dashboard"
-        description="Aggregate analytics are coming later. This dashboard does not show product metrics."
+        description="Open a project to see its analytics. Workspace-wide reporting is not available yet."
       />
       <section className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -79,9 +80,9 @@ function Dashboard() {
         )}
       </section>
       <EmptyState
-        eyebrow="No analytics yet"
-        title="Your product data will live here"
-        description="Recent events are listed on each project. This dashboard does not calculate charts, funnels, or conversion rates."
+        eyebrow="Project analytics"
+        title="Find your product data in each project"
+        description="A project overview shows total events, unique visitors, identified users, events per visitor, an activity chart, top events, and date ranges. Recent events are listed on the project's Events page."
       >
         <ol className="grid gap-3 sm:grid-cols-3">
           {steps.map((step, index) => (
@@ -99,12 +100,6 @@ function Dashboard() {
             </li>
           ))}
         </ol>
-        <div className="mt-6 rounded-lg border border-dashed border-line bg-canvas px-4 py-10 text-center">
-          <p className="text-sm font-semibold text-ink">No chart</p>
-          <p className="mt-1 text-sm text-muted">
-            A chart will appear here after events are collected.
-          </p>
-        </div>
       </EmptyState>
       <PlannedCapabilities />
     </>

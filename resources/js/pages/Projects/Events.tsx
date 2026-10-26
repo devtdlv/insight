@@ -45,7 +45,7 @@ function ProjectEvents({
       <PageHeader
         eyebrow={workspace.name}
         title="Recent events"
-        description="These are events Insight has stored for this project. There are no charts, funnels, or retention numbers on this page."
+        description="These are events Insight has stored for this project. Totals, the activity chart, and top events are on the project overview."
       />
       <WorkspaceNav workspace={workspace} current="projects" />
       <ProjectSectionNav

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAnalyticsEventRequest;
 use App\Models\Project;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 
@@ -45,7 +46,8 @@ class EventIngestionController extends Controller
                 'anonymous_id' => $payload['anonymous_id'],
                 'identified_user_id' => $payload['user_id'] ?? null,
                 'properties' => $properties === [] ? null : $properties,
-                'occurred_at' => $payload['occurred_at'],
+                // Normalize to UTC: the datetime cast formats a parsed string in its own offset.
+                'occurred_at' => CarbonImmutable::parse($payload['occurred_at'])->utc(),
                 'received_at' => now(),
                 'client_event_id' => $payload['event_id'] ?? null,
             ]);

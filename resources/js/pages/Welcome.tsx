@@ -53,11 +53,11 @@ export default function Welcome() {
           <section aria-labelledby="future-views-heading">
             <Card>
               <h2 id="future-views-heading" className="text-lg text-ink">
-                Future views
+                Product views
               </h2>
               <p className="mt-2 text-sm leading-6 text-muted">
-                A later dashboard could list these views. None of them have
-                data.
+                Event tracking and per-project analytics are available after you
+                sign in. The other views are planned.
               </p>
               <ul className="mt-5 grid gap-3">
                 {topics.map((topic) => (

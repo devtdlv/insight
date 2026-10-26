@@ -47,3 +47,12 @@ it('includes migrations for sessions, cache, and queues', function () {
         ->and($migrations)->toContain("Schema::create('job_batches'")
         ->and($migrations)->toContain("Schema::create('failed_jobs'");
 });
+
+it('pins MariaDB and MySQL sessions to UTC so TIMESTAMP columns store UTC', function (string $connection) {
+    expect(config("database.connections.{$connection}.timezone"))->toBe('+00:00');
+})->with(['mysql', 'mariadb']);
+
+it('keeps the application timezone on UTC', function () {
+    expect(config('app.timezone'))->toBe('UTC')
+        ->and(now()->getTimezone()->getName())->toBe('UTC');
+});

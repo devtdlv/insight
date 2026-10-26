@@ -9,9 +9,9 @@ export function PlannedCapabilities() {
         Planned
       </h2>
       <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-        Funnels, retention, journeys, and engagement are a later release. Event
-        collection is available on a project. None of these cards show product
-        metrics.
+        Event tracking and project analytics are available. Funnels, retention,
+        journeys, engagement, and workspace-wide reporting are planned. The
+        cards below describe capabilities and do not show product metrics.
       </p>
       <ul className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {plannedCapabilities.map((item) => (

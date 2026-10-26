@@ -25,7 +25,7 @@ function WorkspaceShow({
       <PageHeader
         eyebrow={roleLabel(workspace.role)}
         title={workspace.name}
-        description="This workspace does not show product metrics. Funnels and retention are coming later."
+        description="Open a project to see its analytics. Workspace-wide reporting, funnels, and retention are not available yet."
       />
       <WorkspaceNav workspace={workspace} current="overview" />
       <div className="grid gap-4 md:grid-cols-3">
