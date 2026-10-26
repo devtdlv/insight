@@ -4,12 +4,12 @@ import { Card } from '../../components/Card.tsx';
 import { EmptyState } from '../../components/EmptyState.tsx';
 import { PageHeader } from '../../components/PageHeader.tsx';
 import { WorkspaceNav } from '../../components/WorkspaceNav.tsx';
-import { AppLayout } from '../../layouts/AppLayout.tsx';
+import { appPage } from '../../layouts/appPage.ts';
 import { buttonClass, textLinkClass } from '../../lib/buttonStyles.ts';
 import { paths, roleLabel } from '../../lib/paths.ts';
 import type { WorkspaceDetail } from '../../types/index.ts';
 
-export default function WorkspaceShow({
+function WorkspaceShow({
   workspace,
   projects,
   memberCount,
@@ -21,11 +21,11 @@ export default function WorkspaceShow({
   const active = projects.filter((project) => project.archivedAt === null);
 
   return (
-    <AppLayout title={workspace.name}>
+    <>
       <PageHeader
         eyebrow={roleLabel(workspace.role)}
         title={workspace.name}
-        description="This workspace does not show product metrics. Event tracking, funnels, and retention are coming later."
+        description="This workspace does not show product metrics. Funnels and retention are coming later."
       />
       <WorkspaceNav workspace={workspace} current="overview" />
       <div className="grid gap-4 md:grid-cols-3">
@@ -59,7 +59,7 @@ export default function WorkspaceShow({
         {active.length === 0 ? (
           <EmptyState
             title="No active projects"
-            description="A project is a website or application in this workspace. None are collecting events yet."
+            description="A project is a website or application in this workspace. Add one, then open Tracking to copy its write key."
           />
         ) : (
           <ul className="grid gap-3">
@@ -79,6 +79,10 @@ export default function WorkspaceShow({
           </ul>
         )}
       </section>
-    </AppLayout>
+    </>
   );
 }
+
+appPage(WorkspaceShow, (props) => props.workspace.name);
+
+export default WorkspaceShow;

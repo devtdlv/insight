@@ -2,11 +2,11 @@ import { Badge } from '../../components/Badge.tsx';
 import { Card } from '../../components/Card.tsx';
 import { PageHeader } from '../../components/PageHeader.tsx';
 import { WorkspaceNav } from '../../components/WorkspaceNav.tsx';
-import { AppLayout } from '../../layouts/AppLayout.tsx';
+import { appPage } from '../../layouts/appPage.ts';
 import { roleLabel } from '../../lib/paths.ts';
 import type { WorkspaceDetail, WorkspaceMember } from '../../types/index.ts';
 
-export default function WorkspaceMembers({
+function WorkspaceMembers({
   workspace,
   members,
 }: {
@@ -14,7 +14,7 @@ export default function WorkspaceMembers({
   members: WorkspaceMember[];
 }) {
   return (
-    <AppLayout title={`${workspace.name} members`}>
+    <>
       <PageHeader
         eyebrow="Members"
         title="People in this workspace"
@@ -33,6 +33,10 @@ export default function WorkspaceMembers({
           </li>
         ))}
       </ul>
-    </AppLayout>
+    </>
   );
 }
+
+appPage(WorkspaceMembers, (props) => `${props.workspace.name} members`);
+
+export default WorkspaceMembers;

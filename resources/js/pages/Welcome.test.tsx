@@ -46,7 +46,9 @@ it('renders the Insight landing page', () => {
   expect(
     screen.getByText(/does not show product metrics/i),
   ).toBeInTheDocument();
-  expect(screen.getByText(/does not collect events yet/i)).toBeInTheDocument();
+  expect(
+    screen.getByText(/only when an application calls the SDK/i),
+  ).toBeInTheDocument();
 
   for (const title of [
     'Event tracking',

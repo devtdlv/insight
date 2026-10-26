@@ -3,20 +3,20 @@ import { Badge } from '../../components/Badge.tsx';
 import { Card } from '../../components/Card.tsx';
 import { EmptyState } from '../../components/EmptyState.tsx';
 import { PageHeader } from '../../components/PageHeader.tsx';
-import { AppLayout } from '../../layouts/AppLayout.tsx';
+import { appPage } from '../../layouts/appPage.ts';
 import { buttonClass } from '../../lib/buttonStyles.ts';
 import { paths, roleLabel } from '../../lib/paths.ts';
 import type { SharedProps } from '../../types/index.ts';
 
-export default function WorkspaceIndex() {
+function WorkspaceIndex() {
   const { workspaces } = usePage<SharedProps>().props;
 
   return (
-    <AppLayout title="Workspaces">
+    <>
       <PageHeader
         eyebrow="Workspaces"
         title="Your workspaces"
-        description="A workspace groups the products you want to understand. Insight does not show product metrics, and it does not collect events yet."
+        description="A workspace groups the products you want to understand. Insight does not show product metrics on this page."
       />
       <div>
         <Link href={paths.workspaceCreate()} className={buttonClass('primary')}>
@@ -49,6 +49,10 @@ export default function WorkspaceIndex() {
           ))}
         </ul>
       )}
-    </AppLayout>
+    </>
   );
 }
+
+appPage(WorkspaceIndex, 'Workspaces');
+
+export default WorkspaceIndex;

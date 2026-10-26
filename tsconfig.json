@@ -22,5 +22,5 @@
       "@/*": ["resources/js/*"]
     }
   },
-  "include": ["resources/js", "vite.config.ts"]
+  "include": ["resources/js", "sdk", "vite.config.ts"]
 }

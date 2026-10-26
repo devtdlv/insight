@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, expect, it, vi } from 'vitest';
+import { AppLayout } from '../layouts/AppLayout.tsx';
 import Dashboard from './Dashboard.tsx';
 
 vi.mock('@inertiajs/react', () => ({
@@ -54,7 +55,11 @@ beforeEach(() => {
 });
 
 it('renders the dashboard shell and planned capabilities', async () => {
-  render(<Dashboard />);
+  render(
+    <AppLayout title="Dashboard">
+      <Dashboard />
+    </AppLayout>,
+  );
 
   expect(
     screen.getByRole('heading', { level: 1, name: 'Dashboard' }),
@@ -94,7 +99,12 @@ it('renders the dashboard shell and planned capabilities', async () => {
     '/workspaces',
   );
 
-  for (const label of ['Events', 'Funnels', 'Retention', 'Settings']) {
+  expect(screen.getByRole('link', { name: 'Events' })).toHaveAttribute(
+    'href',
+    '/workspaces',
+  );
+
+  for (const label of ['Funnels', 'Retention', 'Settings']) {
     expect(screen.getByText(label)).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: label })).not.toBeInTheDocument();
   }

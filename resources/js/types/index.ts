@@ -32,6 +32,24 @@ export type ProjectSummary = {
   canManage: boolean;
 };
 
+export type TrackingProject = {
+  id: number;
+  name: string;
+  timezone: string;
+  archivedAt: string | null;
+  writeKey: string;
+  canManage: boolean;
+};
+
+export type StoredEvent = {
+  id: number;
+  name: string;
+  anonymousId: string;
+  identifiedUserId: string | null;
+  properties: Record<string, unknown> | unknown[] | null;
+  occurredAt: string | null;
+};
+
 export type WorkspaceMember = {
   id: number;
   name: string;

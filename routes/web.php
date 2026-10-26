@@ -5,6 +5,8 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectEventController;
+use App\Http\Controllers\ProjectTrackingController;
 use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\WorkspaceMemberController;
 use Illuminate\Support\Facades\Route;
@@ -43,6 +45,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/workspaces/{workspace}/projects/create', [ProjectController::class, 'create'])->name('projects.create');
         Route::post('/workspaces/{workspace}/projects', [ProjectController::class, 'store'])->name('projects.store');
         Route::get('/workspaces/{workspace}/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+        Route::get('/workspaces/{workspace}/projects/{project}/tracking', [ProjectTrackingController::class, 'show'])->name('projects.tracking');
+        Route::post('/workspaces/{workspace}/projects/{project}/write-key', [ProjectTrackingController::class, 'rotate'])->name('projects.write-key.rotate');
+        Route::get('/workspaces/{workspace}/projects/{project}/events', [ProjectEventController::class, 'index'])->name('projects.events');
         Route::get('/workspaces/{workspace}/projects/{project}/settings', [ProjectController::class, 'edit'])->name('projects.edit');
         Route::patch('/workspaces/{workspace}/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
         Route::post('/workspaces/{workspace}/projects/{project}/archive', [ProjectController::class, 'archive'])->name('projects.archive');

@@ -1,6 +1,6 @@
 # Insight architecture
 
-Insight is a product analytics platform. The application is a conventional Laravel app with a React and TypeScript interface. People sign in with a Laravel session. A signed-in user can create workspaces, belong to them as an owner, admin, or member, and keep analytics projects inside a workspace. Event ingestion, funnels, retention, and billing are later milestones.
+Insight is a product analytics platform. The application is a conventional Laravel app with a React and TypeScript interface. People sign in with a Laravel session. A signed-in user can create workspaces, belong to them as an owner, admin, or member, and keep analytics projects inside a workspace. A project accepts named events through a public write key. Funnels, retention, and billing are later milestones.
 
 ## Stack
 
@@ -42,6 +42,7 @@ insight/
 ├── routes/
 │   ├── web.php           Inertia pages
 │   └── api.php           JSON API
+├── sdk/src/index.ts      Browser tracking SDK, not an npm package
 ├── tests/                Pest feature tests
 └── docs/
 ```
@@ -153,11 +154,11 @@ The `users`, `password_reset_tokens`, and `sessions` tables come from the origin
 
 ## Workspaces and projects
 
-Three migrations add `workspaces`, `workspace_memberships`, and `projects`. They do not change the users table. Apply them with `php artisan migrate` from the repository root. Do not run `migrate:fresh`, `migrate:reset`, or `db:wipe`.
+Migrations add `workspaces`, `workspace_memberships`, `projects`, `projects.write_key`, and `analytics_events`. They do not change the users table. Apply them with `php artisan migrate` from the repository root. Do not run `migrate:fresh`, `migrate:reset`, or `db:wipe`.
 
 A user who creates a workspace becomes its only owner. Registration and login do not create a workspace. Roles are owner, admin, and member. Owners and admins can rename the workspace and can create, edit, archive, and restore projects. Members can view the workspace, its members, and its projects. They receive 403 when they try to change those records. Someone who is not a member receives 404, including when a project id is placed under another workspace's URL. Laravel policies (`WorkspacePolicy`, `ProjectPolicy`) decide view and manage rights. `App\Support\Tenant` turns a missing membership into 404 and a failed manage check into 403.
 
-Projects belong to one workspace. A project has a name, an optional description, an optional http or https website URL, a timezone, and an optional `archived_at`. Archive keeps the row. There is no workspace delete, project delete, invitation, role change, or ownership transfer in the product.
+Projects belong to one workspace. A project has a name, an optional description, an optional http or https website URL, a timezone, a public write key, and an optional `archived_at`. Archive keeps the row and stops ingestion. There is no workspace delete, project delete, invitation, role change, or ownership transfer in the product.
 
 Workspace URLs:
 
@@ -169,13 +170,31 @@ Workspace URLs:
 - `POST /workspaces/{workspace}/projects`
 - `GET /workspaces/{workspace}/projects/{project}` and `GET /workspaces/{workspace}/projects/{project}/settings`
 - `PATCH /workspaces/{workspace}/projects/{project}`
+- `GET /workspaces/{workspace}/projects/{project}/tracking`
+- `POST /workspaces/{workspace}/projects/{project}/write-key`
+- `GET /workspaces/{workspace}/projects/{project}/events`
 - `POST /workspaces/{workspace}/projects/{project}/archive` and `POST .../restore`
 
-Nested project routes use scoped bindings, so a project resolves only when it belongs to the workspace in the URL.
+Nested project routes use scoped bindings, so a project resolves only when it belongs to the workspace in the URL. Members can open tracking setup and recent events. Only owners and admins can rotate the write key. A write key cannot call these routes.
+
+## Event collection
+
+`POST /api/v1/events` is public. It does not use a Laravel session, and it is not on the web middleware group, so it does not change CSRF protection for signed-in pages. `AllowPublicEventIngestion` checks the content type, a 16 KB body limit, and a per-key, per-IP rate limit before validation. The default limit is 60 events per minute (`INSIGHT_INGESTION_PER_MINUTE`). The cache is the database cache in local development and the array cache while tests run.
+
+The request allowlist is `write_key`, `name`, `anonymous_id`, `user_id`, `properties`, `occurred_at`, and `event_id`. `project_id` is discarded. The project is loaded by `write_key`. A missing key returns 401. An archived project returns 403. Neither response includes the project name. Validation failures return 422. A body over 16 KB returns 413. A non-JSON body returns 415. A rate-limit failure returns 429 with `Retry-After`.
+
+A successful insert returns `{"status":"accepted"}`. The same `event_id` for the same project hits the unique index `(project_id, client_event_id)` and returns `{"status":"duplicate"}` with the original row unchanged. Another project may reuse that event id. Rows without an event id are not deduplicated, because the unique index allows multiple nulls.
+
+`analytics_events` stores the project id, event name, anonymous id, optional application user id, JSON properties, `occurred_at`, `received_at`, and optional client event id. It does not store an IP address, a user-agent, or a location. `identified_user_id` is the application's own id, not `users.id`. Eloquent refuses updates and deletes. Deleting a project still removes its events through the foreign key. Indexes cover `(project_id, received_at)` and `(project_id, occurred_at)` for later time-based queries. The recent-events page reads only the authorized project's rows, orders them by `received_at`, and uses simple pagination so it does not count the whole table.
+
+The write key is `iw_` plus 32 random hexadecimal characters. It is generated when a project is created and backfilled for existing projects by the migration. It is stored in plaintext because the project page must show it. Rotation replaces it immediately. A project update cannot set it.
+
+Ingestion CORS allows any origin and does not allow credentials. Health-check CORS stays limited to `CORS_ALLOWED_ORIGINS`. The two path lists are separate so a public event post cannot widen the health endpoint.
+
+The browser SDK lives at `sdk/src/index.ts` and is not an npm package. `track()` is the only way it sends an event. It can persist an anonymous id in `localStorage` or keep it in memory. It does not set a cookie, fingerprint the browser, or read the page automatically. Properties are whatever the host application passes.
 
 ## Later milestones
 
 - Invitations, role changes, and ownership transfer
-- Event ingestion and a tracking SDK
-- Conversion funnels, retention, journeys, and engagement
+- Batch event ingestion, funnels, retention, journeys, and engagement
 - Billing, notifications, and subscription plans

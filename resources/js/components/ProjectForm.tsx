@@ -69,7 +69,7 @@ export function ProjectForm({
         value={form.data.timezone}
         options={timezones}
         error={form.errors.timezone}
-        hint="Used later when event times are shown. No events are collected yet."
+        hint="Recent events use this timezone when they show the event time."
         onChange={(value) => form.setData('timezone', value)}
       />
       <Button type="submit" disabled={form.processing}>

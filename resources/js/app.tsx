@@ -1,6 +1,7 @@
 import { createInertiaApp } from '@inertiajs/react';
 import type { ComponentType } from 'react';
 import { createRoot } from 'react-dom/client';
+import { AppLayout } from './layouts/AppLayout.tsx';
 
 const appName = 'Insight';
 
@@ -25,6 +26,8 @@ createInertiaApp({
   setup({ el, App, props }) {
     createRoot(el).render(<App {...props} />);
   },
+  layout: (name) =>
+    name === 'Welcome' || name.startsWith('Auth/') ? null : AppLayout,
   progress: {
     color: '#145c3e',
   },

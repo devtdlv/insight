@@ -8,19 +8,23 @@ import type { SharedProps } from '../types/index.ts';
 const topics = [
   {
     title: 'Event tracking',
-    body: 'Event tracking records the actions people take in your software, such as opening a screen or finishing a task. Collection is not built yet.',
+    body: 'Event tracking records the actions an application chooses to send, such as finishing a task. Insight does not record page views or clicks on its own.',
+    status: 'SDK available',
   },
   {
     title: 'Conversion funnels',
     body: 'A conversion funnel is an ordered set of actions. It will show where people continue and where they stop. Funnel analysis is not available yet.',
+    status: 'Not available yet',
   },
   {
     title: 'Retention',
     body: 'Retention asks who returns after a first action, and who does not. Retention views are not available yet.',
+    status: 'Not available yet',
   },
   {
     title: 'User journeys',
     body: 'A user journey is the path someone takes across your product. Journey maps are not available yet.',
+    status: 'Not available yet',
   },
 ] as const;
 
@@ -38,9 +42,9 @@ export default function Welcome() {
               your software.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-muted">
-              Insight is the foundation of a product analytics platform. This
-              page does not show product metrics, and Insight does not collect
-              events yet. Creating an account only signs you in.
+              Insight records an event only when an application calls the SDK.
+              This page does not show product metrics. Creating an account only
+              signs you in.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <AuthActions user={user} />
@@ -64,7 +68,13 @@ export default function Welcome() {
                     <span className="text-sm font-medium text-ink">
                       {topic.title}
                     </span>
-                    <Badge tone="neutral">Not available yet</Badge>
+                    <Badge
+                      tone={
+                        topic.status === 'SDK available' ? 'accent' : 'neutral'
+                      }
+                    >
+                      {topic.status}
+                    </Badge>
                   </li>
                 ))}
               </ul>

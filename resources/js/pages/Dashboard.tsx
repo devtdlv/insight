@@ -4,7 +4,7 @@ import { Card } from '../components/Card.tsx';
 import { EmptyState } from '../components/EmptyState.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { PlannedCapabilities } from '../components/PlannedCapabilities.tsx';
-import { AppLayout } from '../layouts/AppLayout.tsx';
+import { appPage } from '../layouts/appPage.ts';
 import { buttonClass } from '../lib/buttonStyles.ts';
 import { paths, roleLabel } from '../lib/paths.ts';
 import type { SharedProps } from '../types/index.ts';
@@ -32,15 +32,15 @@ const steps = [
   },
 ] as const;
 
-export default function Dashboard() {
+function Dashboard() {
   const workspaces = usePage<SharedProps>().props.workspaces ?? [];
 
   return (
-    <AppLayout title="Dashboard">
+    <>
       <PageHeader
         eyebrow="Overview"
         title="Dashboard"
-        description="Analytics features are coming later. This dashboard does not show product metrics, and Insight is not collecting events yet."
+        description="Aggregate analytics are coming later. This dashboard does not show product metrics."
       />
       <section className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -81,7 +81,7 @@ export default function Dashboard() {
       <EmptyState
         eyebrow="No analytics yet"
         title="Your product data will live here"
-        description="When event collection exists, this is where you will read how people use your software. Nothing is measured yet, so there are no charts, users, or conversion rates to display."
+        description="Recent events are listed on each project. This dashboard does not calculate charts, funnels, or conversion rates."
       >
         <ol className="grid gap-3 sm:grid-cols-3">
           {steps.map((step, index) => (
@@ -107,6 +107,10 @@ export default function Dashboard() {
         </div>
       </EmptyState>
       <PlannedCapabilities />
-    </AppLayout>
+    </>
   );
 }
+
+appPage(Dashboard, 'Dashboard');
+
+export default Dashboard;

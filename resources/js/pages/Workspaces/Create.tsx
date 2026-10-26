@@ -3,10 +3,10 @@ import type { FormEvent } from 'react';
 import { Button } from '../../components/Button.tsx';
 import { PageHeader } from '../../components/PageHeader.tsx';
 import { TextField } from '../../components/TextField.tsx';
-import { AppLayout } from '../../layouts/AppLayout.tsx';
+import { appPage } from '../../layouts/appPage.ts';
 import { paths } from '../../lib/paths.ts';
 
-export default function CreateWorkspace() {
+function CreateWorkspace() {
   const form = useForm({
     name: '',
   });
@@ -17,7 +17,7 @@ export default function CreateWorkspace() {
   }
 
   return (
-    <AppLayout title="Create a workspace">
+    <>
       <PageHeader
         eyebrow="Workspaces"
         title="Create a workspace"
@@ -40,6 +40,10 @@ export default function CreateWorkspace() {
           {form.processing ? 'Creating workspace...' : 'Create workspace'}
         </Button>
       </form>
-    </AppLayout>
+    </>
   );
 }
+
+appPage(CreateWorkspace, 'Create a workspace');
+
+export default CreateWorkspace;

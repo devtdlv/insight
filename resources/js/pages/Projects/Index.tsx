@@ -4,12 +4,12 @@ import { Card } from '../../components/Card.tsx';
 import { EmptyState } from '../../components/EmptyState.tsx';
 import { PageHeader } from '../../components/PageHeader.tsx';
 import { WorkspaceNav } from '../../components/WorkspaceNav.tsx';
-import { AppLayout } from '../../layouts/AppLayout.tsx';
+import { appPage } from '../../layouts/appPage.ts';
 import { buttonClass, textLinkClass } from '../../lib/buttonStyles.ts';
 import { paths } from '../../lib/paths.ts';
 import type { ProjectSummary, WorkspaceDetail } from '../../types/index.ts';
 
-export default function ProjectIndex({
+function ProjectIndex({
   workspace,
   projects,
 }: {
@@ -20,7 +20,7 @@ export default function ProjectIndex({
   const archived = projects.filter((project) => project.archivedAt !== null);
 
   return (
-    <AppLayout title={`${workspace.name} projects`}>
+    <>
       <PageHeader
         eyebrow={workspace.name}
         title="Projects"
@@ -67,9 +67,13 @@ export default function ProjectIndex({
           </ul>
         </section>
       ) : null}
-    </AppLayout>
+    </>
   );
 }
+
+appPage(ProjectIndex, (props) => `${props.workspace.name} projects`);
+
+export default ProjectIndex;
 
 function ProjectRow({
   workspaceId,

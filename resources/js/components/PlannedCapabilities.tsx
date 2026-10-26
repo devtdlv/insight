@@ -9,14 +9,17 @@ export function PlannedCapabilities() {
         Planned
       </h2>
       <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-        These parts of Insight are a later release. They are listed so the
-        dashboard has a clear destination. None of them are active.
+        Funnels, retention, journeys, and engagement are a later release. Event
+        collection is available on a project. None of these cards show product
+        metrics.
       </p>
       <ul className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {plannedCapabilities.map((item) => (
           <li key={item.title}>
             <Card className="h-full">
-              <Badge>Planned</Badge>
+              <Badge tone={item.badge === 'Available' ? 'accent' : 'neutral'}>
+                {item.badge}
+              </Badge>
               <h3 className="mt-3 text-xl text-ink">{item.title}</h3>
               <p className="mt-2 text-sm leading-6 text-muted">{item.detail}</p>
             </Card>

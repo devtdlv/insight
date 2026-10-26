@@ -11,6 +11,12 @@ export const paths = {
     `/workspaces/${workspaceId}/projects/${projectId}`,
   projectSettings: (workspaceId: number, projectId: number) =>
     `/workspaces/${workspaceId}/projects/${projectId}/settings`,
+  projectTracking: (workspaceId: number, projectId: number) =>
+    `/workspaces/${workspaceId}/projects/${projectId}/tracking`,
+  projectEvents: (workspaceId: number, projectId: number) =>
+    `/workspaces/${workspaceId}/projects/${projectId}/events`,
+  projectWriteKey: (workspaceId: number, projectId: number) =>
+    `/workspaces/${workspaceId}/projects/${projectId}/write-key`,
   projectArchive: (workspaceId: number, projectId: number) =>
     `/workspaces/${workspaceId}/projects/${projectId}/archive`,
   projectRestore: (workspaceId: number, projectId: number) =>

@@ -2,13 +2,14 @@ import { Link } from '@inertiajs/react';
 import { Badge } from '../../components/Badge.tsx';
 import { Card } from '../../components/Card.tsx';
 import { PageHeader } from '../../components/PageHeader.tsx';
+import { ProjectSectionNav } from '../../components/ProjectSectionNav.tsx';
 import { WorkspaceNav } from '../../components/WorkspaceNav.tsx';
-import { AppLayout } from '../../layouts/AppLayout.tsx';
+import { appPage } from '../../layouts/appPage.ts';
 import { buttonClass } from '../../lib/buttonStyles.ts';
 import { paths } from '../../lib/paths.ts';
 import type { ProjectSummary, WorkspaceDetail } from '../../types/index.ts';
 
-export default function ProjectShow({
+function ProjectShow({
   workspace,
   project,
 }: {
@@ -16,13 +17,19 @@ export default function ProjectShow({
   project: ProjectSummary;
 }) {
   return (
-    <AppLayout title={project.name}>
+    <>
       <PageHeader
         eyebrow={workspace.name}
         title={project.name}
-        description="This project does not show product metrics. Events, funnels, and retention are coming later."
+        description="This project does not show aggregate metrics. Funnels and retention are coming later."
       />
       <WorkspaceNav workspace={workspace} current="projects" />
+      <ProjectSectionNav
+        workspaceId={workspace.id}
+        projectId={project.id}
+        canManage={project.canManage}
+        current="overview"
+      />
       <Card>
         <div className="flex flex-wrap items-center gap-2">
           {project.archivedAt ? <Badge tone="neutral">Archived</Badge> : null}
@@ -62,6 +69,10 @@ export default function ProjectShow({
           A chart will appear here after events are collected.
         </p>
       </div>
-    </AppLayout>
+    </>
   );
 }
+
+appPage(ProjectShow, (props) => props.project.name);
+
+export default ProjectShow;

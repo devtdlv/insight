@@ -1,15 +1,16 @@
 import { useForm } from '@inertiajs/react';
 import { useState } from 'react';
+import { Button } from '../../components/Button.tsx';
 import { ConfirmDialog } from '../../components/ConfirmDialog.tsx';
 import { PageHeader } from '../../components/PageHeader.tsx';
 import { ProjectForm } from '../../components/ProjectForm.tsx';
+import { ProjectSectionNav } from '../../components/ProjectSectionNav.tsx';
 import { WorkspaceNav } from '../../components/WorkspaceNav.tsx';
-import { AppLayout } from '../../layouts/AppLayout.tsx';
+import { appPage } from '../../layouts/appPage.ts';
 import { paths } from '../../lib/paths.ts';
 import type { ProjectSummary, WorkspaceDetail } from '../../types/index.ts';
-import { Button } from '../../components/Button.tsx';
 
-export default function ProjectSettings({
+function ProjectSettings({
   workspace,
   project,
   timezones,
@@ -30,13 +31,19 @@ export default function ProjectSettings({
   }
 
   return (
-    <AppLayout title={`${project.name} settings`}>
+    <>
       <PageHeader
         eyebrow="Project settings"
         title={project.name}
         description="Update the project details, or archive it when it should leave the active list. Archiving does not delete the project."
       />
       <WorkspaceNav workspace={workspace} current="projects" />
+      <ProjectSectionNav
+        workspaceId={workspace.id}
+        projectId={project.id}
+        canManage
+        current="settings"
+      />
       <div className="max-w-xl rounded-xl border border-line bg-surface p-5 shadow-[var(--shadow)]">
         <ProjectForm
           workspaceId={workspace.id}
@@ -51,7 +58,7 @@ export default function ProjectSettings({
         <p className="mt-2 text-sm leading-6 text-muted">
           {project.archivedAt
             ? 'Restoring puts this project back in the active list.'
-            : 'Archived projects stay in this workspace and can be restored. No analytics are deleted, because event collection is not available yet.'}
+            : 'Archived projects stay in this workspace and can be restored. They stop accepting new events until you restore them.'}
         </p>
         {project.archivedAt ? (
           <Button
@@ -84,6 +91,10 @@ export default function ProjectSettings({
           onClose={() => setConfirming(false)}
         />
       ) : null}
-    </AppLayout>
+    </>
   );
 }
+
+appPage(ProjectSettings, (props) => `${props.project.name} settings`);
+
+export default ProjectSettings;

@@ -30,8 +30,9 @@ export function AuthLayout({
               your software.
             </p>
             <p className="mt-4 text-sm leading-6 text-muted">
-              Sign in is available. Event tracking, funnels, retention, and
-              journeys are not available yet.
+              Sign in is available. Event tracking sends only the events an
+              application chooses. Funnels, retention, and journeys are not
+              available yet.
             </p>
           </div>
           <p className="text-sm text-muted">

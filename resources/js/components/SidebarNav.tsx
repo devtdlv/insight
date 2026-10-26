@@ -19,9 +19,14 @@ const sectionsFor = (
   path: string,
 ): { label: string; items: (LinkItem | SoonItem)[] }[] => {
   const workspaceId = path.match(/^\/workspaces\/(\d+)/)?.[1];
+  const projectId = path.match(/^\/workspaces\/\d+\/projects\/(\d+)/)?.[1];
   const projectsHref = workspaceId
     ? `/workspaces/${workspaceId}/projects`
     : '/workspaces';
+  const eventsHref =
+    workspaceId && projectId
+      ? `/workspaces/${workspaceId}/projects/${projectId}/events`
+      : '/workspaces';
 
   return [
     {
@@ -50,7 +55,12 @@ const sectionsFor = (
           label: 'Projects',
           icon: 'projects',
         },
-        { type: 'soon', label: 'Events', icon: 'events' },
+        {
+          type: 'link',
+          href: eventsHref,
+          label: 'Events',
+          icon: 'events',
+        },
         { type: 'soon', label: 'Funnels', icon: 'funnels' },
         { type: 'soon', label: 'Retention', icon: 'retention' },
       ],
@@ -76,7 +86,11 @@ function isCurrent(path: string, item: LinkItem): boolean {
   }
 
   if (item.label === 'Projects') {
-    return /\/projects(\/|$)/.test(path);
+    return /\/projects(\/|$)/.test(path) && !/\/events$/.test(path);
+  }
+
+  if (item.label === 'Events') {
+    return /\/events$/.test(path);
   }
 
   return path === item.href;

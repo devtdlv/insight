@@ -12,13 +12,14 @@ return [
     | Cross-Origin Resource Sharing (CORS) Configuration
     |--------------------------------------------------------------------------
     |
-    | Browser calls from the React app are allowed only for the origins listed
-    | in CORS_ALLOWED_ORIGINS. Credentials stay disabled until authentication
-    | exists. Do not set this to a wildcard.
+    | Browser calls to the health check are allowed only for the origins listed
+    | in CORS_ALLOWED_ORIGINS. Event ingestion uses its own middleware and
+    | allows any browser origin, because a public write key is not a secret.
+    | Do not set this list to a wildcard.
     |
     */
 
-    'paths' => ['api/*'],
+    'paths' => ['api/v1/health'],
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 

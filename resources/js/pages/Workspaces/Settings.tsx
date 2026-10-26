@@ -4,15 +4,11 @@ import { Button } from '../../components/Button.tsx';
 import { PageHeader } from '../../components/PageHeader.tsx';
 import { TextField } from '../../components/TextField.tsx';
 import { WorkspaceNav } from '../../components/WorkspaceNav.tsx';
-import { AppLayout } from '../../layouts/AppLayout.tsx';
+import { appPage } from '../../layouts/appPage.ts';
 import { paths } from '../../lib/paths.ts';
 import type { WorkspaceDetail } from '../../types/index.ts';
 
-export default function WorkspaceSettings({
-  workspace,
-}: {
-  workspace: WorkspaceDetail;
-}) {
+function WorkspaceSettings({ workspace }: { workspace: WorkspaceDetail }) {
   const form = useForm({
     name: workspace.name,
   });
@@ -23,7 +19,7 @@ export default function WorkspaceSettings({
   }
 
   return (
-    <AppLayout title={`${workspace.name} settings`}>
+    <>
       <PageHeader
         eyebrow="Workspace settings"
         title="Rename workspace"
@@ -47,6 +43,10 @@ export default function WorkspaceSettings({
           {form.processing ? 'Saving...' : 'Save name'}
         </Button>
       </form>
-    </AppLayout>
+    </>
   );
 }
+
+appPage(WorkspaceSettings, (props) => `${props.workspace.name} settings`);
+
+export default WorkspaceSettings;
