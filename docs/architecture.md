@@ -1,6 +1,8 @@
 # Insight architecture
 
-Insight is a product analytics platform. The application is a conventional Laravel app with a React and TypeScript interface. People sign in with a Laravel session. A signed-in user can create workspaces, belong to them as an owner, admin, or member, and keep analytics projects inside a workspace. A project accepts named events through a public write key. Funnels, retention, and billing are later milestones.
+Insight is a privacy-first product analytics portfolio application (a completed portfolio MVP, not a hosted service). It is a conventional Laravel app with a React and TypeScript interface. People sign in with a Laravel session. A signed-in user can create workspaces, belong to them as an owner, admin, or member, and keep analytics projects inside a workspace. A project accepts named events through a public write key, from the TypeScript SDK or any HTTP client, and shows analytics computed from those events.
+
+Everything described in this document is implemented, except the final section, [Possible future enhancements](#possible-future-enhancements), which lists work that does not exist.
 
 ## Stack
 
@@ -23,10 +25,17 @@ Laravel lives at the repository root. There is one frontend, and it is rendered 
 
 ```text
 insight/
-├── app/                  Laravel application code
+├── app/
+│   ├── Console/Commands/ insight:seed-demo (local showcase data)
+│   ├── Http/             Controllers (web and Api/V1), middleware, form requests
+│   ├── Models/           User, Workspace, WorkspaceMembership, Project, AnalyticsEvent
+│   ├── Policies/         WorkspacePolicy, ProjectPolicy
+│   ├── Services/Analytics/  ProjectAnalytics and its result objects
+│   └── Support/          Tenant, WriteKey, Timezones, Analytics/DateRangeResolver
 ├── bootstrap/
 ├── config/
-├── database/migrations/  Existing cache, session, and queue tables
+├── database/migrations/  Users, cache, and queue tables, then workspaces, memberships,
+│                         projects, write keys, and analytics_events
 ├── public/               HTTP entry point and the Vite build
 ├── resources/
 │   ├── css/app.css
@@ -42,8 +51,10 @@ insight/
 ├── routes/
 │   ├── web.php           Inertia pages
 │   └── api.php           JSON API
-├── sdk/src/index.ts      Browser tracking SDK, not an npm package
-├── tests/                Pest feature tests
+├── sdk/src/              Browser tracking SDK (index.ts) and its Vitest tests, not an npm package
+├── scripts/              Optional Playwright screenshot capture
+├── tests/                Pest feature and unit tests (frontend tests sit next to their components)
+├── .github/workflows/    CI workflow
 └── docs/
 ```
 
@@ -51,7 +62,7 @@ insight/
 
 ## Inertia
 
-`routes/web.php` maps `/` to the `Welcome` page and `/dashboard` to the `Dashboard` page. `App\Http\Middleware\HandleInertiaRequests` is appended to the web middleware group and renders `resources/views/app.blade.php`.
+`routes/web.php` maps `/` to the `Welcome` page, the guest authentication pages, `/dashboard` to the `Dashboard` page, and the workspace and project routes listed under [Workspaces and projects](#workspaces-and-projects). `App\Http\Middleware\HandleInertiaRequests` is appended to the web middleware group and renders `resources/views/app.blade.php`.
 
 `resources/js/app.tsx` starts the Inertia React app and resolves pages from `resources/js/pages`. Navigation uses Inertia links and Laravel routes.
 
@@ -65,7 +76,9 @@ Shared Inertia props contain the application name, a flash status string, the si
 
 `AuthLayout` renders login, registration, forgot password, and reset password. Validation errors stay tied to each field.
 
-`AppLayout` is the signed-in shell: a skip link, sidebar, mobile dialog navigation, theme control, API status, a workspace switcher, a flash status, and an account menu whose logout is a POST. The sidebar lists only working links: Dashboard, Workspaces, Projects, and Events. Unfinished features are not shown in the application. `Dashboard` requires a session. It lists the signed-in user's workspaces and explains where project analytics live. Planned work is listed in the README.
+`AppLayout` is the signed-in shell: a skip link, sidebar, mobile dialog navigation, theme control, API status, a workspace switcher, a flash status, and an account menu whose logout is a POST. The sidebar lists only working links: Dashboard, Workspaces, Projects, and Events. Unfinished features are not shown in the application. `Dashboard` requires a session. It lists the signed-in user's workspaces and explains where project analytics live.
+
+Project analytics are on the project overview page (`Projects/Show`): metric cards with previous-period comparison, an activity chart with a data-table toggle, top events, and a date-range selector. `Projects/Events` lists recent events, `Projects/Tracking` shows the write key and a copyable SDK example, and `Projects/Settings` edits the project. Workspace pages live in `pages/Workspaces`.
 
 The pages do not invent metrics. The theme preference is stored in localStorage under `insight-theme`. That key does not hold credentials. The status indicator calls `GET /api/v1/health` on the same origin and accepts only the two-field health contract.
 
@@ -84,7 +97,7 @@ The pages do not invent metrics. The theme preference is stored in localStorage 
 
 An HTML `Accept` header does not turn that response into a page and does not redirect it. Unknown API paths return JSON errors.
 
-Future event ingestion and authenticated product routes belong in this API file. They are not implemented.
+`POST /api/v1/events` (and its CORS preflight `OPTIONS`) is the public event ingestion endpoint, handled by `Api\V1\EventIngestionController` behind the `AllowPublicEventIngestion` middleware. See [Event collection](#event-collection). The API has no authenticated routes: signed-in pages use Inertia, not this API.
 
 ## MariaDB
 
@@ -104,7 +117,7 @@ QUEUE_CONNECTION=database
 
 The password stays in the local `.env` file. It is not committed and it is not copied into `.env.example`.
 
-The migrations for `sessions`, `cache`, `cache_locks`, `jobs`, `job_batches`, and `failed_jobs` are already in `database/migrations` and are already applied to the `insight` database. Do not create a second set. Do not run `migrate:fresh`, `migrate:reset`, or `db:wipe`.
+The migrations for `sessions`, `cache`, `cache_locks`, `jobs`, `job_batches`, and `failed_jobs` are already in `database/migrations`. Do not create a second set. Do not run `migrate:fresh`, `migrate:reset`, or `db:wipe`.
 
 Pest forces `DB_CONNECTION=sqlite` and `DB_DATABASE=:memory:`. Those tests check configuration and HTTP behavior. They do not verify the MariaDB server.
 
@@ -186,8 +199,46 @@ Ingestion CORS allows any origin and does not allow credentials. Health-check CO
 
 The browser SDK lives at `sdk/src/index.ts` and is not an npm package. `track()` is the only way it sends an event. It can persist an anonymous id in `localStorage` or keep it in memory. It does not set a cookie, fingerprint the browser, or read the page automatically. Properties are whatever the host application passes.
 
-## Later milestones
+## Analytics aggregation
+
+`ProjectAnalyticsRequest` validates the range query (a preset of 24 hours, 7, 30, or 90 days, or custom dates up to 90 days). `App\Support\Analytics\DateRangeResolver` turns it into a `DateRange`: half-open UTC windows computed from the project's IANA timezone, so a daylight saving day of 23 or 25 hours is handled correctly. The previous period is built with the same calendar rules.
+
+`App\Services\Analytics\ProjectAnalytics::summarize()` runs every query against one project's events, filtered on `occurred_at`:
+
+- **Metrics:** one aggregate query with `COUNT(*)`, `COUNT(DISTINCT anonymous_id)`, and `COUNT(DISTINCT identified_user_id)` (which ignores nulls), for the current and the previous period. Events per visitor is derived from those counts.
+- **Activity:** hourly buckets for the 24-hour preset and custom ranges of up to two days, and daily buckets otherwise, counted in SQL with a `CASE` expression over the bucket boundaries, so empty buckets still appear and the current, partial bucket is marked.
+- **Top events:** counts grouped by event name with each name's share of all events.
+
+The project overview receives the result as a single `analytics` prop. Changing the date range makes an Inertia partial reload of only that prop.
+
+## Tenant isolation
+
+Data belongs to a hierarchy: workspace → project → event. Isolation is enforced on the server at each level:
+
+- Workspace and project controllers (or their form requests) check access through `App\Support\Tenant`, which returns 404 when the user has no membership, so other tenants' workspaces are not revealed. A failed manage check returns 403.
+- Project routes use scoped bindings, so a project id placed under another workspace's URL does not resolve.
+- `WorkspacePolicy` and `ProjectPolicy` decide view and manage rights from the membership role.
+- Analytics and event queries always filter on the authorized project's id.
+- Ingestion finds the project by write key only and ignores any `project_id` in the body.
+- Shared Inertia props include only the signed-in user's own workspaces, and never email addresses, passwords, or tokens.
+
+The React interface hides actions a user cannot take, but security does not depend on it.
+
+## Privacy design
+
+- Collection is explicit: an event exists only when application code calls `track()` or posts to the endpoint. There is no automatic page, click, or form capture, no session recording, and no fingerprinting.
+- `analytics_events` has no IP address, user-agent, or location columns. The client IP is used only, combined with the write key, as a hashed rate-limit key.
+- The SDK keeps an anonymous id in `localStorage` (or in memory only) and sets no cookies.
+- `identified_user_id` is the host application's own id. Applications should not send emails or other personal data as ids or properties. Insight does not inspect property contents beyond size and shape limits.
+- Write keys can only record events. They cannot read data or change settings.
+
+These are design decisions, not audited guarantees or certifications.
+
+## Possible future enhancements
+
+None of these are implemented:
 
 - Invitations, role changes, and ownership transfer
-- Batch event ingestion, funnels, retention, journeys, and engagement
-- Billing, notifications, and subscription plans
+- Batch event ingestion
+- Funnels, retention, journeys, and engagement analysis
+- Workspace-wide reporting
