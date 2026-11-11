@@ -4,7 +4,22 @@
 
 Insight collects the events an application explicitly chooses to send, such as `report_exported`, and turns them into project-level analytics: totals, unique visitors, identified users, activity over time, and top events. Teams organize their work in workspaces, and each workspace holds projects with their own write key, timezone, and event history.
 
-This is a portfolio application. It is a complete working codebase with automated tests, but it is not a hosted analytics service and has not been run in production.
+**Status: Completed Portfolio MVP.** Insight is a portfolio application. It is a complete working codebase with automated tests, but it is not a hosted analytics service, it is not commercially available, and it has not been deployed or run in production.
+
+## Engineering highlights
+
+What the codebase demonstrates, with the code that shows it:
+
+| Area                              | Where to look                                                                                                                                                                               |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| REST API design                   | Versioned JSON routes in `routes/api.php`, with explicit status codes for each outcome (`app/Http/Controllers/Api/V1/EventIngestionController.php`)                                         |
+| Event ingestion and validation    | Field allowlist and rules in `app/Http/Requests/StoreAnalyticsEventRequest.php`; content-type and body-size checks in `app/Http/Middleware/AllowPublicEventIngestion.php`                   |
+| Rate limiting and deduplication   | Per write key and client IP rate limit in the same middleware; a `(project_id, client_event_id)` unique index that turns a repeated event into a `duplicate` response                       |
+| Multi-tenant authorization        | `WorkspacePolicy`, `ProjectPolicy`, `App\Support\Tenant`, and scoped route bindings in `routes/web.php`                                                                                     |
+| Analytics queries and aggregation | `app/Services/Analytics/ProjectAnalytics.php` (SQL `COUNT` and `COUNT(DISTINCT)` aggregates, time buckets, top events) and the timezone-aware `app/Support/Analytics/DateRangeResolver.php` |
+| React dashboard development       | Inertia pages in `resources/js/pages` and reusable components such as `ActivityChart`, `MetricCard`, and `DateRangeSelector` in `resources/js/components`                                   |
+| TypeScript SDK design             | `sdk/src/index.ts`: a dependency-free client with typed results, no throwing on network failure, and configurable id persistence                                                            |
+| Automated testing                 | Pest feature and unit tests in `tests/`, Vitest and React Testing Library tests next to the components and in `sdk/src/index.test.ts`, run in [GitHub Actions](.github/workflows/ci.yml)    |
 
 ## Screenshots
 
@@ -77,7 +92,7 @@ Everything below exists in the code and is covered by automated tests.
 **Analytics**
 
 - Total events, unique visitors, identified users, and events per visitor
-- Activity over time, hourly for 24-hour ranges and daily otherwise, with partial periods marked
+- Activity over time, hourly for the 24-hour preset and custom ranges of up to two days and daily otherwise, with partial periods marked
 - Top events with counts and share of all events
 - Date ranges: last 24 hours, 7, 30, and 90 days, and custom ranges up to 90 days
 - Previous-period comparison for each metric
@@ -161,7 +176,7 @@ These steps use PowerShell. On macOS or Linux, use `cp` instead of `Copy-Item`. 
    GRANT ALL PRIVILEGES ON insight.* TO 'insight'@'127.0.0.1';
    ```
 
-5. Set `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` in `.env`. Never commit `.env`.
+5. Set `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` in `.env`. Never commit `.env`. See [Environment configuration](#environment-configuration) for the other settings.
 
 6. Create the tables.
 
@@ -182,6 +197,22 @@ These steps use PowerShell. On macOS or Linux, use `cp` instead of `Copy-Item`. 
 8. Open `http://127.0.0.1:8000`, register an account, and create a workspace and a project.
 
 Run `php artisan queue:work` in a third terminal only if you add queued jobs. Password reset emails are written to the log because `MAIL_MAILER=log`.
+
+### Environment configuration
+
+`.env.example` holds working local defaults. The settings you are most likely to change:
+
+| Variable                                             | Default in `.env.example`                     | Purpose                                                                   |
+| ---------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------- |
+| `APP_URL`                                            | `http://localhost:8000`                       | Base URL used for generated links, such as password reset emails          |
+| `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE` | `mysql`, `127.0.0.1`, `3306`, `insight`       | MariaDB connection                                                        |
+| `DB_USERNAME`, `DB_PASSWORD`                         | empty                                         | Your local database credentials                                           |
+| `CACHE_STORE`, `SESSION_DRIVER`, `QUEUE_CONNECTION`  | `database`                                    | Laravel's database drivers, so no Redis is needed                         |
+| `CORS_ALLOWED_ORIGINS`                               | `http://localhost:5173,http://127.0.0.1:5173` | Origins allowed to call `GET /api/v1/health` (event ingestion allows any) |
+| `INSIGHT_INGESTION_PER_MINUTE`                       | `60`                                          | Event ingestion rate limit per write key and client IP                    |
+| `MAIL_MAILER`                                        | `log`                                         | Where password reset emails go; `log` writes them to the Laravel log      |
+
+The automated tests do not read these database settings. `phpunit.xml` switches them to SQLite in memory.
 
 ## JavaScript SDK
 
@@ -277,6 +308,10 @@ The screenshots in this README show the workspace as **Northstar Analytics** and
 
 `php artisan test` uses SQLite in memory and does not connect to MariaDB, so a passing run does not prove that MariaDB is configured.
 
+### Continuous integration
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on pushes to `main` and on pull requests. A backend job runs Pint and the PHP tests on PHP 8.2, and a frontend job runs the TypeScript check, ESLint, Prettier, Vitest, and the production build on Node.js 24. It needs no database server, because the PHP tests use SQLite in memory.
+
 ### Screenshot automation (optional)
 
 `npm run screenshots` runs `scripts/capture-screenshots.mjs`, which uses Playwright Chromium to capture the images in `docs/screenshots/`. It is a local developer workflow only.
@@ -289,7 +324,18 @@ The session stays in memory. The script never reads, logs, or saves credentials,
 
 ## Project status
 
-Insight is a completed portfolio milestone. Authentication, workspaces and projects, event ingestion, the SDK, and project analytics all work and are tested. It is not presented as a production-ready hosted SaaS.
+**Completed Portfolio MVP.** Authentication, workspaces and projects, event ingestion, the SDK, and project analytics all work and are tested. It is not presented as a production-ready hosted SaaS. See [`docs/RELEASE_NOTES_v0.1.0.md`](docs/RELEASE_NOTES_v0.1.0.md) for a summary of the MVP.
+
+### Known limitations
+
+- Not deployed. There is no hosted instance, and the app has only been run locally.
+- No security audit, penetration test, or compliance certification.
+- The automated PHP tests run on SQLite in memory, so MariaDB-specific behavior is not covered by automated tests.
+- Workspace members are read-only: there are no invitations, role changes, ownership transfer, or workspace and project deletion in the interface.
+- The ingestion endpoint accepts one event per request. There is no batch endpoint.
+- The HTTP endpoint accepts events up to 30 days old. Older history can only be created by the local showcase command.
+- Analytics are per project. There is no cross-project or workspace-wide reporting.
+- The SDK is a single TypeScript file and is not published to npm.
 
 Possible future work, none of which is implemented or shown in the application:
 
@@ -301,4 +347,4 @@ Possible future work, none of which is implemented or shown in the application:
 
 ## License
 
-This repository does not include a `LICENSE` file, so no license is granted by the repository itself. `composer.json` contains `"license": "MIT"`, which is inherited from the Laravel project skeleton and is not a substitute for a license file. Add a `LICENSE` file before reusing or redistributing the code.
+Insight is released under the [MIT License](LICENSE). Copyright (c) 2026 devtdlv.
